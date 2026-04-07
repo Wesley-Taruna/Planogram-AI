@@ -12,6 +12,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from vision_checker import check_compliance
+from pdf_extractor import extract_planogram
 
 load_dotenv()
 
@@ -136,9 +137,27 @@ async def upload_planogram(
         f.write(content)
 
     planogram_id = pdf_file.filename.replace(".pdf", "")
+
+    # Auto-extract structured JSON from the uploaded PDF
+    try:
+        planogram_data = extract_planogram(str(save_path), force=True)
+        sections = len(planogram_data.get("gondola_sections", []))
+        total_products = planogram_data.get("total_products", 0)
+        extraction_status = "ok"
+    except Exception as e:
+        print(f"[main] Warning: PDF extraction failed for {planogram_id}: {e}")
+        sections = 0
+        total_products = 0
+        extraction_status = f"failed: {str(e)}"
+
     return {
         "message": "Planogram uploaded successfully.",
         "planogram_id": planogram_id,
         "filename": pdf_file.filename,
         "size_bytes": len(content),
+        "extraction": {
+            "status": extraction_status,
+            "sections_found": sections,
+            "total_products": total_products,
+        },
     }
