@@ -2,26 +2,15 @@
 main.py
 -------
 FastAPI server — the entry point for the Planogram AI engine.
-
-Endpoints:
-  POST /check     — submit a shelf photo + planogram ID, get compliance result
-  GET  /health    — simple health check
-  GET  /docs      — auto-generated API docs (FastAPI built-in)
-
-Run with:
-  uvicorn main:app --reload --port 8000
-
-Then open: http://localhost:8000/docs to test it in the browser.
 """
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
-import base64
 import os
+import httpx
 from pathlib import Path
 from dotenv import load_dotenv
 
-from pdf_extractor import extract_first_page_as_base64
 from vision_checker import check_compliance
 
 load_dotenv()
@@ -36,6 +25,36 @@ app = FastAPI(
 Path("planograms").mkdir(exist_ok=True)
 
 
+async def send_to_supabase(result: dict):
+    """Background task to save the check result to Supabase."""
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_key = os.getenv("SUPABASE_KEY")
+    supabase_table = os.getenv("SUPABASE_TABLE", "compliance_logs")
+    
+    if not supabase_url or not supabase_key:
+        print("[main] Warning: SUPABASE_URL or SUPABASE_KEY not found. Skipping DB logging.")
+        return
+
+    # Trim trailing slash if present
+    base_url = supabase_url.rstrip('/')
+    endpoint = f"{base_url}/rest/v1/{supabase_table}"
+    
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post(endpoint, json=result, headers=headers)
+            res.raise_for_status()
+            print(f"[main] Successfully logged result to Supabase ({supabase_table}) for store {result.get('store_id')}")
+    except Exception as e:
+        print(f"[main] Failed to log result to Supabase: {e}")
+
+
 @app.get("/health")
 def health_check():
     """Simple ping to confirm the server is running."""
@@ -44,19 +63,17 @@ def health_check():
 
 @app.post("/check")
 async def check_planogram(
+    background_tasks: BackgroundTasks,
     planogram_id: str = Form(..., description="Planogram file ID, e.g. SNACK2C"),
     store_id: str = Form(..., description="Store ID, e.g. FM-CIBUBUR-001"),
     shelf_photo: UploadFile = File(..., description="Photo of the actual shelf taken by supervisor"),
 ):
     """
     Main endpoint. Receives:
-    - planogram_id: which planogram to check against (must have matching PDF in /planograms folder)
+    - planogram_id: which planogram to check against
     - store_id: which store this is
     - shelf_photo: image file of the real shelf (JPG or PNG)
-
-    Returns a JSON compliance report.
     """
-
     # Validate file type
     allowed_types = {"image/jpeg", "image/jpg", "image/png"}
     if shelf_photo.content_type not in allowed_types:
@@ -65,45 +82,40 @@ async def check_planogram(
             detail=f"Invalid file type: {shelf_photo.content_type}. Only JPG and PNG allowed."
         )
 
-    # Read the uploaded shelf photo
+    # Read the uploaded shelf photo bytes
     photo_bytes = await shelf_photo.read()
     if len(photo_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-    shelf_photo_b64 = base64.standard_b64encode(photo_bytes).decode("utf-8")
+    # Locate the PDF file and pass its path
+    pdf_path = Path("planograms") / f"{planogram_id}.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail=f"Planogram PDF {planogram_id}.pdf not found.")
 
-    # Determine media type
-    media_type = "image/png" if shelf_photo.content_type == "image/png" else "image/jpeg"
-
-    # Extract reference image from planogram PDF
-    try:
-        reference_b64 = extract_first_page_as_base64(planogram_id)
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"PDF extraction error: {str(e)}")
-
-    # Run Claude Vision compliance check
+    # Run Gemini Vision compliance check
     try:
         result = check_compliance(
-            reference_base64=reference_b64,
-            shelf_photo_base64=shelf_photo_b64,
+            pdf_path=str(pdf_path),
+            shelf_photo_bytes=photo_bytes,
             planogram_id=planogram_id,
             store_id=store_id,
-            image_media_type=media_type,
+            image_media_type=shelf_photo.content_type,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI check error: {str(e)}")
+
+    # Schedule background task to upload result to DB only if it's not an internal handled error
+    if result.get("status") != "error":
+        background_tasks.add_task(send_to_supabase, result)
+    else:
+        print(f"[main] Compliance check returned error status, skipping DB upload: {result.get('summary')}")
 
     return JSONResponse(content=result)
 
 
 @app.get("/planograms")
 def list_planograms():
-    """
-    List all available planogram PDFs in the /planograms folder.
-    Useful for FamilyLink to know which planogram IDs are valid.
-    """
+    """List all available planogram PDFs in the /planograms folder."""
     planogram_dir = Path("planograms")
     files = [f.stem for f in planogram_dir.glob("*.pdf")]
     return {"available_planograms": sorted(files), "count": len(files)}
@@ -113,10 +125,7 @@ def list_planograms():
 async def upload_planogram(
     pdf_file: UploadFile = File(..., description="Planogram PDF file from planogram team"),
 ):
-    """
-    Upload a new planogram PDF to the engine.
-    The filename becomes the planogram_id (e.g. SNACK2C.pdf → planogram_id: SNACK2C).
-    """
+    """Upload a new planogram PDF to the engine."""
     if not pdf_file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 

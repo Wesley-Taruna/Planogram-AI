@@ -2,53 +2,28 @@
 vision_checker.py
 -----------------
 The core AI engine.
-Takes two images:
-  1. Reference image extracted from the planogram PDF
-  2. Real shelf photo taken by the store supervisor
-
-Sends both to Claude Vision with a structured prompt.
-Returns a compliance result as a Python dict (later converted to JSON).
+Takes a planogram PDF and a real shelf photo.
+Uploads the PDF via Gemini File API, passes image bytes directly,
+and enforces a structured JSON dictionary output using the google-genai SDK.
 """
 
-import anthropic
-import json
-import base64
+from google import genai
+from google.genai import types
 from datetime import datetime
 from dotenv import load_dotenv
+import os
+import json
+
+from models import CheckResult
 
 load_dotenv()
-
-client = anthropic.Anthropic()  # automatically picks up ANTHROPIC_API_KEY from .env
 
 SYSTEM_PROMPT = """
 You are a planogram compliance checker for FamilyMart Indonesia.
 
-Your job is to compare a real shelf photo against a planogram reference image 
+Your job is to compare a real shelf photo against a planogram reference PDF image 
 (uploaded by the FamilyMart planogram team) and determine whether the product 
 placement is correct.
-
-You must respond ONLY with a valid JSON object. No explanation, no markdown, 
-no extra text — just the raw JSON.
-
-The JSON must follow this exact structure:
-{
-  "status": "pass" or "fail",
-  "compliance_score": integer from 0 to 100,
-  "issues": [
-    {
-      "type": "missing" | "misplaced" | "unexpected",
-      "product": "product name or description",
-      "expected_position": "row X, slot Y or zone description",
-      "found_position": "where it actually is (if misplaced)",
-      "note": "optional extra detail"
-    }
-  ],
-  "correct": [
-    "Product A is correctly placed at row 1 slot 1",
-    "Product B is correctly placed at row 2"
-  ],
-  "summary": "One sentence summary of the compliance check result"
-}
 
 Rules:
 - "missing": product should be there per planogram but not visible in shelf photo
@@ -60,154 +35,113 @@ Rules:
 """
 
 USER_PROMPT = """
-I need you to check if this store shelf matches the planogram reference.
+You are a planogram compliance auditor. Your job is to compare the SHELF PHOTO 
+against the PLANOGRAM PDF.
 
-IMAGE 1 is the PLANOGRAM REFERENCE — this is how the shelf SHOULD look.
-IMAGE 2 is the ACTUAL SHELF PHOTO — this is how the shelf looks RIGHT NOW.
+STEP 1 — ZONE IDENTIFICATION:
+Divide the shelf photo into 3 horizontal zones: LEFT, CENTER, RIGHT.
+Identify which planogram zone each corresponds to.
 
-Compare them carefully:
-- Which products are correctly placed?
-- Which products are missing from the shelf?
-- Which products are in the wrong position?
-- Are there any products on the shelf that should NOT be there?
+STEP 2 — MATCH CONFIDENCE:
+If visual overlap with planogram is below 40%, set overall_confidence = "LOW" 
+and return an empty violations list. DO NOT fabricate missing items for 
+unrelated shelves.
 
-Return your analysis as JSON following the exact structure I specified.
+STEP 3 — VIOLATIONS (only if confidence >= 40%):
+Report at most 5 violations. Prioritize: MISPLACED > MISSING > UNEXPECTED.
+
+Return ONLY valid JSON matching the schema. No explanation text.
 """
 
-
-def encode_image_to_base64(image_path: str) -> str:
-    """
-    Encode a local image file to base64 string.
-    Use this when the shelf photo is uploaded as a file.
-    """
-    with open(image_path, "rb") as f:
-        return base64.standard_b64encode(f.read()).decode("utf-8")
-
-
 def check_compliance(
-    reference_base64: str,
-    shelf_photo_base64: str,
+    pdf_path: str,
+    shelf_photo_bytes: bytes,
     planogram_id: str,
     store_id: str,
     image_media_type: str = "image/jpeg",
 ) -> dict:
     """
-    Main function. Sends both images to Claude Vision and returns
+    Main function. Sends PDF and image to Gemini and returns
     the compliance result as a Python dict.
 
     Args:
-        reference_base64:   Base64 string of the planogram PDF page image
-        shelf_photo_base64: Base64 string of the real shelf photo
-        planogram_id:       e.g. "SNACK2C"
-        store_id:           e.g. "FM-CIBUBUR-001"
-        image_media_type:   "image/jpeg" or "image/png"
+        pdf_path: Absolute or relative path to the planogram PDF file
+        shelf_photo_bytes: Raw bytes of the real shelf photo
+        planogram_id: e.g. "SNACK2C"
+        store_id: e.g. "FM-CIBUBUR-001"
+        image_media_type: "image/jpeg" or "image/png"
 
     Returns:
-        dict with status, compliance_score, issues, correct, summary
+        dict with status, compliance_score, issues, correct, summary, timestamp
     """
     print(f"[vision_checker] Checking {planogram_id} for store {store_id}...")
+    uploaded_file = None
 
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1500,
-        system=SYSTEM_PROMPT,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    # IMAGE 1: Planogram reference (from PDF)
-                    {
-                        "type": "text",
-                        "text": "IMAGE 1 — PLANOGRAM REFERENCE (how the shelf should look):"
-                    },
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/png",  # PDF pages are always PNG
-                            "data": reference_base64,
-                        },
-                    },
-                    # IMAGE 2: Real shelf photo
-                    {
-                        "type": "text",
-                        "text": "IMAGE 2 — ACTUAL SHELF PHOTO (how the shelf looks right now):"
-                    },
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": image_media_type,
-                            "data": shelf_photo_base64,
-                        },
-                    },
-                    # The actual instruction
-                    {
-                        "type": "text",
-                        "text": USER_PROMPT
-                    },
-                ],
-            }
-        ],
-    )
-
-    raw_text = response.content[0].text.strip()
-    print(f"[vision_checker] Claude responded ({len(raw_text)} chars)")
-
-    # Parse the JSON response
     try:
-        # Strip markdown code fences if Claude adds them despite instructions
-        if raw_text.startswith("```"):
-            raw_text = raw_text.split("```")[1]
-            if raw_text.startswith("json"):
-                raw_text = raw_text[4:]
-        result = json.loads(raw_text.strip())
-    except json.JSONDecodeError as e:
-        print(f"[vision_checker] JSON parse error: {e}")
-        print(f"[vision_checker] Raw response: {raw_text[:500]}")
-        # Return a graceful error result instead of crashing
-        result = {
+        # Initialize client here to avoid crashing FastAPI at boot if GEMINI_API_KEY is missing
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY is not set in environment variables.")
+        client = genai.Client(api_key=api_key)
+
+        # Step 1: Upload the PDF file to Gemini
+        print(f"[vision_checker] Uploading PDF {pdf_path} to Gemini...")
+        uploaded_file = client.files.upload(file=pdf_path)
+
+        # Step 2: Prepare the image part
+        image_part = types.Part.from_bytes(data=shelf_photo_bytes, mime_type=image_media_type)
+
+        # Step 3: Run the structured generation
+        print("[vision_checker] Running inference with Gemini 2.5 Flash...")
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                "IMAGE 1 — PLANOGRAM REFERENCE (how the shelf should look):",
+                uploaded_file,
+                "IMAGE 2 — ACTUAL SHELF PHOTO (how the shelf looks right now):",
+                image_part,
+                USER_PROMPT
+            ],
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                response_mime_type="application/json",
+                response_schema=CheckResult,
+                temperature=0.0,
+            )
+        )
+
+        print("[vision_checker] Inference complete.")
+        
+        # result.parsed holds the Pydantic instance if response_schema is set.
+        if response.parsed:
+            result_dict = response.parsed.model_dump()
+        else:
+            # Fallback
+            result_dict = json.loads(response.text)
+            
+        result_dict["planogram_id"] = planogram_id
+        result_dict["store_id"] = store_id
+        result_dict["timestamp"] = datetime.utcnow().isoformat() + "Z"
+        
+        return result_dict
+
+    except Exception as e:
+        print(f"[vision_checker] Error during generation: {e}")
+        return {
+            "planogram_id": planogram_id,
+            "store_id": store_id,
             "status": "error",
             "compliance_score": 0,
             "issues": [],
             "correct": [],
-            "summary": f"AI parsing error. Raw response: {raw_text[:200]}",
+            "summary": f"AI Engine Error: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
         }
-
-    # Add metadata
-    result["planogram_id"] = planogram_id
-    result["store_id"] = store_id
-    result["timestamp"] = datetime.utcnow().isoformat()
-
-    return result
-
-
-# Quick test — run this file directly with two test images
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 3:
-        print("Usage: python vision_checker.py <reference_image> <shelf_photo>")
-        print("Example: python vision_checker.py planogram_ref.png shelf_photo.jpg")
-        sys.exit(1)
-
-    ref_path = sys.argv[1]
-    shelf_path = sys.argv[2]
-
-    ref_b64 = encode_image_to_base64(ref_path)
-
-    # Detect media type from file extension
-    ext = shelf_path.split(".")[-1].lower()
-    media_type = "image/png" if ext == "png" else "image/jpeg"
-    shelf_b64 = encode_image_to_base64(shelf_path)
-
-    result = check_compliance(
-        reference_base64=ref_b64,
-        shelf_photo_base64=shelf_b64,
-        planogram_id="TEST",
-        store_id="FM-TEST-001",
-        image_media_type=media_type,
-    )
-
-    print("\n===== COMPLIANCE RESULT =====")
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    finally:
+        # Step 4: CRITICAL cleanup
+        if uploaded_file:
+            print(f"[vision_checker] Deleting temporary Gemini file {uploaded_file.name}...")
+            try:
+                client.files.delete(name=uploaded_file.name)
+            except Exception as delete_err:
+                print(f"[vision_checker] Failed to delete Gemini file {uploaded_file.name}: {delete_err}")
