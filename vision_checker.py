@@ -1,42 +1,100 @@
 """
 vision_checker.py
 -----------------
-3-step AI compliance engine:
+Three clearly separated responsibilities:
 
-  Step A — Section identification:
-            Photo → which planogram section is this? (fingerprint matching)
+  [AI]     Step 1 — Gemini scans the shelf photo BLINDLY.
+           No planogram hints. Reports only what it actually sees.
 
-  Step B — Product detection:
-            Photo → structured list of every visible product with row + position
+  [AI]     Step 2 — For ambiguous/low-confidence detections, Gemini
+           uses Google Search to confirm the exact product variant
+           (flavor, size, color) based on packaging visuals.
 
-  Step C — Compliance comparison:
-            Detected products + planogram reference → correct / missing / misplaced / unexpected
+  [Code]   Step 3 — Python compares the verified detection list
+           against the planogram JSON.
+
+Why web search verification?
+  Snack products in Indonesia often share very similar packaging.
+  Example: All QTELA variants have similar orange/yellow colors.
+  By searching "QTELA snack Indonesia varian" Gemini can distinguish
+  between Balado, Original, Barbeque by packaging color + design.
+
+Output fields:
+  found_on_shelf     : in planogram AND detected in photo  ✅
+  missing_from_shelf : in planogram but NOT in photo       ❌
+  not_in_planogram   : detected in photo but NOT in planogram ⚠️
 """
 
 from google import genai
 from google.genai import types
+from pydantic import BaseModel
 from datetime import datetime
 from dotenv import load_dotenv
-from typing import Optional
+from difflib import SequenceMatcher
+from typing import List, Optional
 import os
 import json
 
-from models import CheckResult
 from pdf_extractor import extract_planogram
+
+
+# ── Pydantic schemas ──────────────────────────────────────────────────────────
+
+class DetectedProduct(BaseModel):
+    product_name:    str
+    brand:           str
+    color_hint:      str
+    confidence:      int            # 0-100
+    needs_web_check: bool           # True if ambiguous / low confidence
+    ambiguity_note:  Optional[str]  # e.g. "unsure if Balado or BBQ flavor"
+
+class DetectionResult(BaseModel):
+    detected: List[DetectedProduct]
+
+class VerifiedProduct(BaseModel):
+    original_name:  str   # what Gemini saw
+    verified_name:  str   # confirmed name after web search
+    verified_brand: str
+    confidence:     int
+    search_used:    bool
+    search_query:   Optional[str]
+    reasoning:      str   # why this verification was made
+
+class VerificationResult(BaseModel):
+    products: List[VerifiedProduct]
+
 
 load_dotenv()
 
-SYSTEM_PROMPT = """
-You are a planogram compliance checker for FamilyMart Indonesia.
-You help store supervisors verify that shelf products match the official planogram layout.
-Always be thorough, precise, and objective. Never skip products.
+# ── Prompts ───────────────────────────────────────────────────────────────────
+
+SYSTEM_PROMPT_DETECTION = """
+You are a shelf scanning system for a retail store in Indonesia.
+Your only job: look at the photo and report exactly what products you can see.
+Do NOT guess. Do NOT assume. Only report what is clearly visible.
+If a label is unreadable, describe the packaging visually instead of guessing a name.
+Return JSON only.
 """
+
+SYSTEM_PROMPT_VERIFICATION = """
+You are a product verification assistant for an Indonesian retail store.
+You have access to Google Search to look up snack product details.
+Your job: confirm the exact product name, brand, and variant for ambiguous detections.
+
+When searching:
+- Search in Indonesian or English: e.g. "QTELA singkong varian rasa Indonesia"
+- Look for packaging images to match color and design
+- Focus on confirming the FLAVOR/VARIANT specifically
+- Indonesian snack brands to know: Chitato, Qtela, Kusuka, Tao Kae Noi, Potabee,
+  Japota, Chiki, Cheetos, Oishi, Piattos, Taro, Happytos, Garuda, Dua Kelinci, etc.
+"""
+
+MATCH_THRESHOLD = 0.70
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _parse_json_response(text: str) -> dict:
-    """Strip markdown fences and parse JSON from a Gemini response."""
+def _parse_json(text: str) -> dict:
     raw = text.strip()
     if raw.startswith("```"):
         parts = raw.split("```")
@@ -44,264 +102,391 @@ def _parse_json_response(text: str) -> dict:
         if raw.startswith("json"):
             raw = raw[4:]
         raw = raw.strip()
-    return json.loads(raw)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        print(f"[parser] JSON truncated at char {e.pos}. Attempting partial recovery...")
+        try:
+            cutoff = raw.rfind("},")
+            if cutoff > 0:
+                partial = raw[:cutoff + 1] + "]}"
+                return json.loads(partial)
+        except Exception:
+            pass
+        print(f"[parser] Could not recover. Raw snippet: {raw[:200]}")
+        return {"detected": [], "products": []}
 
 
-def _build_planogram_text(planogram_data: dict, section_id: Optional[str] = None) -> str:
-    """
-    Render the extracted planogram JSON as a numbered position list.
-    If section_id is given, only render that section.
-    """
-    lines = []
-    lines.append(f"Planogram: {planogram_data.get('planogram_id')} — {planogram_data.get('planogram_title')}")
-    lines.append(f"Category: {planogram_data.get('category')}")
-    lines.append("")
+def _similarity(a: str, b: str) -> float:
+    a = a.lower().strip()
+    b = b.lower().strip()
+    if a == b:
+        return 1.0
+    if a in b or b in a:
+        return 0.85
+    a_words = set(a.split())
+    b_words = set(b.split())
+    common  = a_words & b_words
+    if len(common) >= 2:
+        word_score = len(common) / max(len(a_words), len(b_words))
+        return max(word_score, SequenceMatcher(None, a, b).ratio())
+    return SequenceMatcher(None, a, b).ratio()
 
+
+def _get_planogram_products(planogram_data: dict) -> list:
+    seen, products = set(), []
     for sec in planogram_data.get("gondola_sections", []):
-        sid = sec.get("section_id")
-        if section_id and sid != section_id:
-            continue
-
-        lines.append(f"SECTION {sid} — {sec.get('section_label')} [{sec.get('shelf_level')}]")
-        lines.append(f"  Description : {sec.get('description')}")
-        lines.append(f"  Fingerprint : {sec.get('visual_fingerprint')}")
-        lines.append("  Expected products (left → right):")
         for p in sec.get("products", []):
-            facing_note = f" (×{p['facings']} facings)" if p.get("facings", 1) > 1 else ""
-            lines.append(
-                f"    [{sid}-P{p['position']:02d}] {p['product_name']}"
-                f" | {p['brand']} | {p['color_hint']}, {p['size_hint']}{facing_note}"
-            )
-        lines.append("")
-
-    return "\n".join(lines)
-
-
-def _get_section_products(planogram_data: dict, section_id: Optional[str]) -> list:
-    """Return the flat product list for a section (or all sections if None)."""
-    products = []
-    for sec in planogram_data.get("gondola_sections", []):
-        if section_id and sec.get("section_id") != section_id:
-            continue
-        for p in sec.get("products", []):
-            products.append({
-                "section_id": sec.get("section_id"),
-                "section_label": sec.get("section_label"),
-                "position_key": f"{sec.get('section_id')}-P{p['position']:02d}",
-                "position": p["position"],
-                "product_name": p["product_name"],
-                "brand": p["brand"],
-                "color_hint": p["color_hint"],
-                "size_hint": p["size_hint"],
-                "facings": p.get("facings", 1),
-            })
+            key = p["product_name"].lower().strip()
+            if key not in seen:
+                seen.add(key)
+                products.append({
+                    "product_name": p["product_name"],
+                    "brand":        p["brand"],
+                    "color_hint":   p.get("color_hint", ""),
+                    "size_hint":    p.get("size_hint", ""),
+                    "section_id":   sec["section_id"],
+                })
     return products
 
 
-# ── Step A: Section Identification ────────────────────────────────────────────
+# ── Step 1 (AI): Blind detection ──────────────────────────────────────────────
 
-def _identify_section(client, image_part, planogram_data: dict) -> Optional[str]:
+def _image_to_json(client, image_part: types.Part) -> list:
     """
-    Identify which planogram section the shelf photo shows by fingerprint matching.
-    Returns section_id or None if confidence < 55%.
+    Gemini scans the shelf photo with ZERO knowledge of the planogram.
+    Now also flags products that need web verification.
     """
-    section_lines = []
-    for sec in planogram_data.get("gondola_sections", []):
-        section_lines.append(
-            f"  {sec['section_id']}: {sec['section_label']} "
-            f"| Fingerprint: {sec['visual_fingerprint']}"
-        )
-
-    prompt = f"""
-Look at this shelf photo carefully.
-
-These are all planogram sections and their visual fingerprints:
-{chr(10).join(section_lines)}
-
-1. Describe the brands and product types you can see in this shelf photo.
-2. Match your observation against the section fingerprints above.
-3. Pick the single best-matching section_id.
-4. Rate your confidence 0–100.
-
-Return ONLY this JSON:
-{{
-  "visible_summary": "<what brands/products you see>",
-  "best_match_section_id": "<section_id>",
-  "confidence": <0-100>,
-  "reason": "<brief explanation>"
-}}
-"""
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=["SHELF PHOTO:", image_part, prompt],
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            temperature=0.0,
-        ),
-    )
-
-    data = _parse_json_response(response.text)
-    confidence = data.get("confidence", 0)
-    section_id = data.get("best_match_section_id")
-
-    print(f"[step-A] Matched section: {section_id}  confidence: {confidence}%")
-    print(f"[step-A] Visible: {data.get('visible_summary')}")
-    print(f"[step-A] Reason:  {data.get('reason')}")
-
-    return section_id if confidence >= 55 else None
-
-
-# ── Step B: Product Detection ─────────────────────────────────────────────────
-
-def _detect_products(client, image_part, planogram_text: str) -> list:
-    """
-    Scan the shelf photo and return a structured list of every visible product
-    with its row and left-to-right position.
-    """
-    prompt = f"""
-You are scanning a store shelf photo to catalog every visible product.
-
-For reference, this shelf section should contain:
-{planogram_text}
-
-TASK — Scan the shelf photo completely:
-- Divide the shelf into rows from top to bottom (Row 1 = top, Row 2 = next, etc.)
-- Within each row scan left to right (Position 1 = leftmost)
-- Record EVERY product you can see, even if partially visible
-- Use the planogram reference only as a hint for product names you cannot read clearly
-
-Return ONLY this JSON:
-{{
-  "total_rows_detected": <number>,
-  "rows": [
-    {{
-      "row": <row number>,
-      "row_description": "<e.g. top shelf / second shelf>",
-      "products": [
-        {{
-          "position": <left-to-right number starting at 1>,
-          "product_name": "<best guess at product name>",
-          "brand": "<brand name>",
-          "color_hint": "<dominant packaging color>",
-          "confidence": <0-100, how sure you are about this product>
-        }}
-      ]
-    }}
-  ]
-}}
+    prompt = """
+Scan this retail shelf photo carefully — top to bottom, left to right.
+List every product you can clearly see.
 
 Rules:
-- Do NOT skip empty slots — mark them as {{"product_name": "EMPTY", "brand": "", "color_hint": "", "confidence": 100}}
-- List every product you can see, do not skip any
-- confidence = how certain you are about the product identity (100 = clearly readable label)
+- Only report products that are CLEARLY VISIBLE in the photo
+- Do NOT guess or invent products
+- Read the label as printed on the packaging
+- product_name    : name as printed on packaging
+- brand           : brand name as printed on packaging
+- color_hint      : dominant packaging color(s), be specific
+                    e.g. "dark green bag with yellow logo"
+- confidence      : 100 = clearly readable, 60 = partially visible, 30 = guessing
+- needs_web_check : true if you are UNSURE of the exact flavor/variant/size
+                    Common cases:
+                    · Multiple variants with similar packaging colors
+                      (e.g. QTELA has Balado=red, Original=yellow, BBQ=brown)
+                    · Label is partially blocked or at an angle
+                    · You can read the brand but NOT the variant name
+- ambiguity_note  : describe WHY you're unsure, what visual cues you see
+                    e.g. "can see QTELA brand clearly, packaging is reddish-orange
+                    but cannot confirm if Balado or Spicy variant"
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=["SHELF PHOTO TO SCAN:", image_part, prompt],
+        model="gemini-2.5-pro",
+        contents=["SHELF PHOTO:", image_part, prompt],
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
+            system_instruction=SYSTEM_PROMPT_DETECTION,
             response_mime_type="application/json",
-            temperature=0.0,
-        ),
-    )
-
-    data = _parse_json_response(response.text)
-    rows = data.get("rows", [])
-    total = sum(len(r.get("products", [])) for r in rows)
-    print(f"[step-B] Detected {total} product slots across {data.get('total_rows_detected', len(rows))} rows.")
-    for row in rows:
-        print(f"[step-B]   Row {row['row']} ({row.get('row_description', '')}): "
-              f"{len(row.get('products', []))} products")
-
-    return rows
-
-
-# ── Step C: Compliance Comparison ─────────────────────────────────────────────
-
-def _compare(
-    client,
-    image_part,
-    planogram_text: str,
-    planogram_products: list,
-    detected_rows: list,
-) -> dict:
-    """
-    Compare detected products against the planogram reference.
-    Returns the full CheckResult-compatible dict.
-    """
-    detected_flat = []
-    for row in detected_rows:
-        for p in row.get("products", []):
-            detected_flat.append(
-                f"  Row {row['row']} Pos {p['position']}: {p['product_name']} "
-                f"[{p['brand']}] — {p['color_hint']} (confidence: {p['confidence']}%)"
-            )
-
-    planogram_flat = []
-    for p in planogram_products:
-        planogram_flat.append(
-            f"  [{p['position_key']}] Position {p['position']}: {p['product_name']} "
-            f"[{p['brand']}] — {p['color_hint']}, {p['size_hint']}"
-        )
-
-    prompt = f"""
-You are producing a COMPLETE planogram compliance report.
-
-═══ PLANOGRAM REFERENCE (what SHOULD be on the shelf) ═══
-{planogram_text}
-
-Numbered reference positions:
-{chr(10).join(planogram_flat)}
-
-═══ DETECTED PRODUCTS IN SHELF PHOTO ═══
-{chr(10).join(detected_flat)}
-
-═══ INSTRUCTIONS ═══
-Go through EVERY planogram reference position one by one:
-
-1. CORRECT — The expected product is present at the correct position
-   → Add the product name to the "correct" list
-
-2. MISSING — The expected product is NOT visible in the shelf photo at all
-   → Add to "issues" with type="missing", include expected_position
-
-3. MISPLACED — A product is visible but in the WRONG shelf position
-   (e.g. product from position 3 is sitting at position 1)
-   → Add to "issues" with type="misplaced", include expected_position and found_position
-
-4. UNEXPECTED — A product is visible in the photo that does NOT appear
-   anywhere in the planogram reference
-   → Add to "issues" with type="unexpected", include found_position
-
-SCORING:
-  compliance_score = round((correct_count / total_planogram_positions) × 100)
-  status = "pass" if compliance_score >= 80 else "fail"
-
-Write a concise summary (1-2 sentences) describing the overall shelf condition.
-
-Return ONLY valid JSON matching the schema exactly. Be exhaustive — do not omit any position.
-"""
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=["SHELF PHOTO (for final verification):", image_part, prompt],
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=CheckResult,
+            response_schema=DetectionResult,
             temperature=0.0,
         ),
     )
 
     if response.parsed:
-        return response.parsed.model_dump()
-    return _parse_json_response(response.text)
+        detected = [p.model_dump() for p in response.parsed.detected]
+    else:
+        data     = _parse_json(response.text)
+        detected = data.get("detected", [])
+
+    needs_check = [p for p in detected if p.get("needs_web_check")]
+    reliable    = [p for p in detected if not p.get("needs_web_check") and p["confidence"] >= 50]
+
+    print(f"\n[step-1] Gemini blind detection — {len(detected)} total products seen:")
+    for p in detected:
+        flag  = "✓" if p["confidence"] >= 60 else "~"
+        web   = " 🔍[needs web check]" if p.get("needs_web_check") else ""
+        note  = f" → {p['ambiguity_note']}" if p.get("ambiguity_note") else ""
+        print(f"  {flag} [{p['confidence']}%] {p['product_name']} | {p['brand']} | {p['color_hint']}{web}{note}")
+
+    print(f"\n[step-1] Summary: {len(reliable)} clear | {len(needs_check)} need web verification | "
+          f"{len(detected) - len(reliable) - len(needs_check)} dropped (low confidence)")
+
+    return reliable, needs_check
 
 
-# ── Public entry point ─────────────────────────────────────────────────────────
+# ── Step 2 helpers ────────────────────────────────────────────────────────────
+
+def _parse_verification_response(raw_text: str, fallback_products: list) -> list:
+    """
+    Parses the free-form text response from Step 2 (google_search mode).
+
+    Why needed:
+      Gemini's google_search tool is INCOMPATIBLE with response_mime_type +
+      response_schema. We must parse the text output ourselves.
+
+    Strategy:
+      1. Extract JSON block from text (handles markdown fences, extra prose)
+      2. Partial recovery if JSON is truncated
+      3. Passthrough fallback — never crashes the pipeline
+    """
+    text = raw_text.strip()
+
+    # Remove markdown fences if present
+    if "```" in text:
+        for part in text.split("```"):
+            candidate = part.strip()
+            if candidate.startswith("json"):
+                candidate = candidate[4:].strip()
+            if candidate.startswith("{"):
+                text = candidate
+                break
+
+    # Find outermost { ... } block
+    start = text.find("{")
+    if start != -1:
+        depth, end, in_str, escape = 0, -1, False, False
+        for i, ch in enumerate(text[start:], start):
+            if escape:
+                escape = False
+                continue
+            if ch == "\\" and in_str:
+                escape = True
+                continue
+            if ch == '"':
+                in_str = not in_str
+                continue
+            if in_str:
+                continue
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    end = i
+                    break
+
+        if end != -1:
+            json_str = text[start:end + 1]
+            try:
+                data = json.loads(json_str)
+                products = data.get("products", [])
+                if products:
+                    print(f"[step-2] Parsed {len(products)} verified product(s) from JSON.")
+                    return products
+            except json.JSONDecodeError as e:
+                print(f"[step-2] JSON parse failed: {e}. Trying partial recovery...")
+                cutoff = json_str.rfind("},")
+                if cutoff > 0:
+                    try:
+                        data = json.loads(json_str[:cutoff + 1] + "]}")
+                        products = data.get("products", [])
+                        if products:
+                            print(f"[step-2] Partial recovery: {len(products)} product(s).")
+                            return products
+                    except Exception:
+                        pass
+
+    # Passthrough fallback — keep original names, pipeline never crashes
+    print(f"[step-2] ⚠️  JSON extraction failed. Passthrough for {len(fallback_products)} product(s).")
+    print(f"[step-2] Raw snippet: {raw_text[:300]}")
+    return [
+        {
+            "original_name":  p["product_name"],
+            "verified_name":  p["product_name"],
+            "verified_brand": p["brand"],
+            "confidence":     p["confidence"],
+            "search_used":    False,
+            "search_query":   None,
+            "reasoning":      "Passthrough — JSON parse failed, using original detection.",
+        }
+        for p in fallback_products
+    ]
+
+
+# ── Step 2 (AI + Web Search): Verify ambiguous detections ────────────────────
+
+def _verify_with_web(client, ambiguous_products: list) -> list:
+    """
+    For each product flagged as ambiguous, Gemini uses Google Search
+    to look up packaging images and confirm the exact variant.
+
+    Uses Gemini's built-in Google Search grounding tool.
+    Returns a list of verified products with corrected names.
+    """
+    if not ambiguous_products:
+        print("\n[step-2] No ambiguous products — skipping web verification.")
+        return []
+
+    print(f"\n[step-2] Web verification for {len(ambiguous_products)} ambiguous product(s)...")
+
+    # Build the verification prompt with all ambiguous products
+    products_text = "\n".join([
+        f"{i+1}. Brand: {p['brand']} | Seen as: {p['product_name']} | "
+        f"Color: {p['color_hint']} | Confidence: {p['confidence']}% | "
+        f"Ambiguity: {p.get('ambiguity_note', 'unclear variant')}"
+        for i, p in enumerate(ambiguous_products)
+    ])
+
+    prompt = f"""
+For each product below, search Google to confirm the EXACT product name and variant.
+
+PRODUCTS TO VERIFY:
+{products_text}
+
+For each product, you MUST:
+1. Search: "[brand name] snack Indonesia varian" OR "[brand] [color] packaging"
+   Examples:
+   - "QTELA singkong snack Indonesia semua varian"
+   - "Kusuka keripik singkong varian rasa kemasan"
+   - "Chitato Lite varian rasa packaging warna"
+   - "Tao Kae Noi Big Sheet varian Indonesia"
+
+2. Use packaging COLOR as your primary discriminator:
+   Common color-variant patterns for Indonesian snacks:
+   · QTELA: Balado=red/orange, Original=yellow, BBQ=brown/dark, Barbeque=dark brown
+   · Kusuka: Balado=red, BBQ=brown, Original=yellow, Keju=orange, Super Pedas=red+chili
+   · Chitato Lite: Nori Seaweed=dark green, Sour Cream=white/blue, Ayam Bawang=yellow
+   · Chitato regular: Ayam Bumbu=yellow, Sapi BBQ=red, Original=plain
+   · Tao Kae Noi Big Sheet: Classic=green, Spicy=red, Chili Garlic=orange/yellow
+   · Potabee: BBQ=dark, Seaweed=green, Salted Egg=yellow/gold, Spicy=red
+   · Japota: Original=yellow, Honey Butter=yellow/gold, Seaweed=green
+   · Happytos: Merah (red bag)=Corn Chips, Hijau (green bag)=Tortilla
+   · Tos Tos: Original=blue/yellow, Nacho Cheese=orange, Korean BBQ=dark red
+
+3. verified_name must be the EXACT product name with variant
+   e.g. "Qtela Singkong Balado 100g" not just "Qtela Singkong"
+
+IMPORTANT: You MUST respond with ONLY a valid JSON object.
+No markdown, no explanation text, no code fences.
+Exact format required:
+{{
+  "products": [
+    {{
+      "original_name": "...",
+      "verified_name": "...",
+      "verified_brand": "...",
+      "confidence": 85,
+      "search_used": true,
+      "search_query": "...",
+      "reasoning": "..."
+    }}
+  ]
+}}
+"""
+
+    # ── IMPORTANT: google_search tool is incompatible with response_mime_type
+    # ── and response_schema. Use free-form text, then parse manually.
+    response = client.models.generate_content(
+        model="gemini-2.5-pro",
+        contents=[prompt],
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT_VERIFICATION,
+            tools=[types.Tool(google_search=types.GoogleSearch())],
+            temperature=0.0,
+            # NO response_mime_type here — incompatible with tool use
+            # NO response_schema here — incompatible with tool use
+        ),
+    )
+
+    raw_text = response.text if response.text else ""
+    verified = _parse_verification_response(raw_text, ambiguous_products)
+
+    print(f"\n[step-2] Web verification results:")
+    for v in verified:
+        search_flag = "🔍 searched" if v.get("search_used") else "💭 inferred"
+        changed     = " ← CORRECTED" if v["original_name"].lower() != v["verified_name"].lower() else ""
+        print(f"  {search_flag} | {v['original_name']} → {v['verified_name']}{changed}")
+        if v.get("search_query"):
+            print(f"           Query: \"{v['search_query']}\"")
+        print(f"           Reasoning: {v['reasoning'][:100]}...")
+
+    # Convert back to DetectedProduct format for step 3
+    result = []
+    for v in verified:
+        result.append({
+            "product_name": v["verified_name"],
+            "brand":        v["verified_brand"],
+            "color_hint":   "",
+            "confidence":   v["confidence"],
+            "needs_web_check": False,
+            "ambiguity_note": None,
+        })
+
+    return result
+
+
+# ── Step 3 (Code): Compare detected vs planogram ─────────────────────────────
+
+def _compare(detected: list, planogram_products: list) -> dict:
+    """
+    Pure Python comparison — no AI, no hallucination.
+    Combines clear detections + web-verified detections.
+    """
+    found_on_shelf     = []
+    missing_from_shelf = []
+    not_in_planogram   = []
+    matched_indices    = set()
+
+    print(f"\n[step-3] Matching {len(detected)} detected → {len(planogram_products)} planogram products")
+    print(f"         Match threshold: {MATCH_THRESHOLD}\n")
+
+    for plan_p in planogram_products:
+        best_score = 0.0
+        best_idx   = -1
+        best_name  = ""
+
+        for i, det_p in enumerate(detected):
+            score = _similarity(plan_p["product_name"], det_p["product_name"])
+            pb = plan_p["brand"].lower()
+            db = det_p["brand"].lower()
+            if pb and db and (pb in db or db in pb):
+                score = min(1.0, score + 0.10)
+            if score > best_score:
+                best_score = score
+                best_idx   = i
+                best_name  = det_p["product_name"]
+
+        if best_score >= MATCH_THRESHOLD and best_idx != -1:
+            found_on_shelf.append(plan_p["product_name"])
+            matched_indices.add(best_idx)
+            match_note = f" ← matched '{best_name}'" if best_name.lower() != plan_p["product_name"].lower() else ""
+            print(f"  ✅ FOUND   : {plan_p['product_name']}{match_note} (score: {best_score:.2f})")
+        else:
+            missing_from_shelf.append(plan_p["product_name"])
+            print(f"  ❌ MISSING : {plan_p['product_name']}"
+                  + (f" (closest: '{best_name}' score: {best_score:.2f})" if best_name else ""))
+
+    for i, det_p in enumerate(detected):
+        if i not in matched_indices:
+            not_in_planogram.append(det_p["product_name"])
+            print(f"  ⚠️  EXTRA  : {det_p['product_name']} [{det_p['brand']}] — not in planogram")
+
+    total            = len(planogram_products)
+    n_found          = len(found_on_shelf)
+    compliance_score = round((n_found / total * 100)) if total > 0 else 0
+    status           = "pass" if compliance_score >= 80 else "fail"
+
+    summary_parts = [
+        f"{n_found} of {total} planogram products found on shelf ({compliance_score}% compliance)."
+    ]
+    if missing_from_shelf:
+        preview = ", ".join(missing_from_shelf[:3])
+        extra   = f" and {len(missing_from_shelf) - 3} more" if len(missing_from_shelf) > 3 else ""
+        summary_parts.append(f"Missing: {preview}{extra}.")
+    if not_in_planogram:
+        summary_parts.append(f"{len(not_in_planogram)} product(s) on shelf not in planogram.")
+
+    return {
+        "found_on_shelf":     found_on_shelf,
+        "missing_from_shelf": missing_from_shelf,
+        "not_in_planogram":   not_in_planogram,
+        "compliance_score":   compliance_score,
+        "status":             status,
+        "summary":            " ".join(summary_parts),
+    }
+
+
+# ── Public entry point ────────────────────────────────────────────────────────
 
 def check_compliance(
     pdf_path: str,
@@ -310,21 +495,7 @@ def check_compliance(
     store_id: str,
     image_media_type: str = "image/jpeg",
 ) -> dict:
-    """
-    Full 3-step compliance check.
-
-    Args:
-        pdf_path: Path to planogram PDF (JSON sidecar is loaded/created automatically)
-        shelf_photo_bytes: Raw bytes of the shelf photo
-        planogram_id: e.g. "SNACK3C"
-        store_id: e.g. "FM-CIBUBUR-001"
-        image_media_type: "image/jpeg" or "image/png"
-
-    Returns:
-        dict with planogram_id, store_id, status, compliance_score,
-              correct[], issues[], summary, timestamp
-    """
-    print(f"\n[vision_checker] ── Starting check: {planogram_id} / {store_id} ──")
+    print(f"\n[vision_checker] ── Check: {planogram_id} / {store_id} ──")
 
     try:
         api_key = os.getenv("GEMINI_API_KEY")
@@ -332,56 +503,67 @@ def check_compliance(
             raise ValueError("GEMINI_API_KEY not set.")
         client = genai.Client(api_key=api_key)
 
-        # ── Load planogram JSON (cached; extracts from PDF if missing) ──────
-        print(f"[vision_checker] Loading planogram JSON...")
-        planogram_data = extract_planogram(pdf_path)
-        total_sections = len(planogram_data.get("gondola_sections", []))
-        print(f"[vision_checker] {total_sections} sections, {planogram_data.get('total_products')} products loaded.")
+        # Load planogram reference
+        print("[vision_checker] Loading planogram JSON...")
+        planogram_data     = extract_planogram(pdf_path)
+        planogram_products = _get_planogram_products(planogram_data)
+        print(f"[vision_checker] {len(planogram_products)} unique products in planogram.")
 
-        # ── Prepare image ─────────────────────────────────────────────────────
-        image_part = types.Part.from_bytes(data=shelf_photo_bytes, mime_type=image_media_type)
+        # Prepare image
+        image_part = types.Part.from_bytes(
+            data=shelf_photo_bytes,
+            mime_type=image_media_type,
+        )
 
-        # ── Step A: Identify which section the photo shows ───────────────────
-        print("[vision_checker] Step A — Identifying shelf section...")
-        section_id = _identify_section(client, image_part, planogram_data)
-        if section_id:
-            print(f"[vision_checker] Locked to section {section_id}.")
-        else:
-            print("[vision_checker] Low confidence — using full planogram as reference.")
+        # ── Step 1: Blind detection ──────────────────────────────────────────
+        print("\n[vision_checker] Step 1 — Blind shelf scan (no hints)...")
+        clear_detections, ambiguous = _image_to_json(client, image_part)
 
-        planogram_text = _build_planogram_text(planogram_data, section_id)
-        planogram_products = _get_section_products(planogram_data, section_id)
-        print(f"[vision_checker] Reference: {len(planogram_products)} positions to check.")
+        # ── Step 2: Web search verification for ambiguous products ───────────
+        print("\n[vision_checker] Step 2 — Web verification for ambiguous products...")
+        verified_detections = _verify_with_web(client, ambiguous)
 
-        # ── Step B: Detect all products in the shelf photo ───────────────────
-        print("[vision_checker] Step B — Scanning shelf photo for products...")
-        detected_rows = _detect_products(client, image_part, planogram_text)
+        # Merge clear + verified into one final detection list
+        all_detections = clear_detections + verified_detections
+        print(f"\n[vision_checker] Final detection list: "
+              f"{len(clear_detections)} clear + {len(verified_detections)} verified "
+              f"= {len(all_detections)} total")
 
-        # ── Step C: Compare and produce full report ───────────────────────────
-        print("[vision_checker] Step C — Running compliance comparison...")
-        result = _compare(client, image_part, planogram_text, planogram_products, detected_rows)
+        # ── Step 3: Python comparison ────────────────────────────────────────
+        print("\n[vision_checker] Step 3 — Comparing against planogram...")
+        result = _compare(all_detections, planogram_products)
 
-        result["planogram_id"] = planogram_id
-        result["store_id"] = store_id
-        result["timestamp"] = datetime.utcnow().isoformat() + "Z"
+        print(
+            f"\n[vision_checker] ── Final Result ──\n"
+            f"  found_on_shelf     : {len(result['found_on_shelf'])}\n"
+            f"  missing_from_shelf : {len(result['missing_from_shelf'])}\n"
+            f"  not_in_planogram   : {len(result['not_in_planogram'])}\n"
+            f"  compliance_score   : {result['compliance_score']}%\n"
+            f"  status             : {result['status']}"
+        )
 
-        # Summary log
-        n_correct = len(result.get("correct", []))
-        n_issues = len(result.get("issues", []))
-        print(f"[vision_checker] Done — score: {result.get('compliance_score')}% | "
-              f"correct: {n_correct} | issues: {n_issues} | status: {result.get('status')}")
-
-        return result
+        return {
+            "planogram_id":       planogram_id,
+            "store_id":           store_id,
+            "status":             result["status"],
+            "compliance_score":   result["compliance_score"],
+            "found_on_shelf":     result["found_on_shelf"],
+            "missing_from_shelf": result["missing_from_shelf"],
+            "not_in_planogram":   result["not_in_planogram"],
+            "summary":            result["summary"],
+            "timestamp":          datetime.utcnow().isoformat() + "Z",
+        }
 
     except Exception as e:
         print(f"[vision_checker] ERROR: {e}")
         return {
-            "planogram_id": planogram_id,
-            "store_id": store_id,
-            "status": "error",
-            "compliance_score": 0,
-            "issues": [],
-            "correct": [],
-            "summary": f"AI Engine Error: {str(e)}",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "planogram_id":       planogram_id,
+            "store_id":           store_id,
+            "status":             "error",
+            "compliance_score":   0,
+            "found_on_shelf":     [],
+            "missing_from_shelf": [],
+            "not_in_planogram":   [],
+            "summary":            f"AI Engine Error: {str(e)}",
+            "timestamp":          datetime.utcnow().isoformat() + "Z",
         }

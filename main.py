@@ -6,6 +6,7 @@ FastAPI server — the entry point for the Planogram AI engine.
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import httpx
 from pathlib import Path
@@ -20,6 +21,16 @@ app = FastAPI(
     title="Planogram AI Engine",
     description="AI-powered planogram compliance checker for FamilyMart Indonesia",
     version="1.0.0",
+)
+
+# Allow the HTML frontend to call this API from any origin (dev-friendly).
+# In production, tighten allowed_origins to your actual domain.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Make sure planograms folder exists
@@ -112,6 +123,21 @@ async def check_planogram(
         print(f"[main] Compliance check returned error status, skipping DB upload: {result.get('summary')}")
 
     return JSONResponse(content=result)
+
+
+@app.get("/planograms/{planogram_id}/pdf")
+def serve_planogram_pdf(planogram_id: str):
+    """Serve the raw PDF file so the frontend iframe can display it."""
+    from fastapi.responses import FileResponse
+    pdf_path = Path("planograms") / f"{planogram_id}.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail=f"{planogram_id}.pdf not found.")
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf",
+        filename=f"{planogram_id}.pdf",
+        headers={"Content-Disposition": "inline"},  # display, don't force-download
+    )
 
 
 @app.get("/planograms")

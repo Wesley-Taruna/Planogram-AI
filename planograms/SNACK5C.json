@@ -1,0 +1,1979 @@
+{
+  "planogram_id": "SNACK5C",
+  "planogram_title": "SNACK5C",
+  "category": "Snacks",
+  "gondola_sections": [
+    {
+      "section_id": "1.1",
+      "section_label": "Shelf 1.1 - Top",
+      "shelf_level": "top",
+      "description": "Chuba and Kusuka cassava/singkong chips.",
+      "visual_fingerprint": "Chuba logo, yellow and red bags, Kasuka logo, green and yellow bags, cassava chips, singkong chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Chuba Keripik Singkong Keju 125g",
+          "brand": "Chuba",
+          "variant": "Keripik Singkong Keju 125g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Chuba Cassava Sambal Balado 125g",
+          "brand": "Chuba",
+          "variant": "Cassava Sambal Balado 125g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Kusuka Keripik Singkong Barbeque 180G",
+          "brand": "Kusuka",
+          "variant": "Keripik Singkong Barbeque 180G",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Kusuka Kripik Singkong Keju Bakar 180G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Keju Bakar 180G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Kusuka Kripik Singkong Balado 180G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Balado 180G",
+          "facings": 1,
+          "color_hint": "red bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "1.2",
+      "section_label": "Shelf 1.2 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Qtela and Kusuka singkong chips.",
+      "visual_fingerprint": "Qtela logo, red and green bags, Kusuka logo, yellow and green bags, singkong chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Qtela Singkong Balado 100g",
+          "brand": "Qtela",
+          "variant": "Singkong Balado 100g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Qtela Singkong Original 175g",
+          "brand": "Qtela",
+          "variant": "Singkong Original 175g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Qtela Balado 175G",
+          "brand": "Qtela",
+          "variant": "Balado 175G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Kusuka Krpk Singkong Jagung Amerika 100g",
+          "brand": "Kusuka",
+          "variant": "Krpk Singkong Jagung Amerika 100g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Kusuka Kripik Singkong Original 180G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Original 180G",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "1.3",
+      "section_label": "Shelf 1.3 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Qtela, Kusuka, and Kobe Bonkrispi singkong/ubi chips.",
+      "visual_fingerprint": "Qtela logo, green bag, Kusuka logo, red and green bags, Kobe Bonkrispi logo, yellow and red bags, singkong and ubi chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Qtela Singkong Barbeque 60g",
+          "brand": "Qtela",
+          "variant": "Singkong Barbeque 60g",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Kusuka Kripik Singkong Super Pedas 50G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Super Pedas 50G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Kusuka Kripik Singkong Bbq 60G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Bbq 60G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Kusuka Kripik Singkong Ayam LadaHtm 60G",
+          "brand": "Kusuka",
+          "variant": "Kripik Singkong Ayam LadaHtm 60G",
+          "facings": 1,
+          "color_hint": "dark green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Kobe Bonkrispi Ubi Original Pck 50gr",
+          "brand": "Kobe Bonkrispi",
+          "variant": "Ubi Original Pck 50gr",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Kobe Bonkrispi Ubi Balado Pck 50gr",
+          "brand": "Kobe Bonkrispi",
+          "variant": "Ubi Balado Pck 50gr",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "1.4",
+      "section_label": "Shelf 1.4 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Taro, Qtela, Lemonilo Chimi, Chuba tempe/ubi chips.",
+      "visual_fingerprint": "Taro logo, green and red bags, Qtela logo, green and red bags, Lemonilo Chimi logo, yellow bag, Chuba logo, purple bag, tempe and ubi chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Taro Tempe Chicken Onion 50g",
+          "brand": "Taro",
+          "variant": "Tempe Chicken Onion 50g",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Qtela Tempe Rumput Laut 55g",
+          "brand": "Qtela",
+          "variant": "Tempe Rumput Laut 55g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Qtela Tempe Cabe Rawit 55g",
+          "brand": "Qtela",
+          "variant": "Tempe Cabe Rawit 55g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Lemonilo Chimi K Ubi Jagung Bkr 50g",
+          "brand": "Lemonilo Chimi",
+          "variant": "K Ubi Jagung Bakar 50g",
+          "facings": 1,
+          "color_hint": "yellow bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Kusuka Ubimix Honey 40g",
+          "brand": "Kusuka",
+          "variant": "Ubimix Honey 40g",
+          "facings": 1,
+          "color_hint": "purple bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Chuba Keripik Ubi Sweet Corn 45g",
+          "brand": "Chuba",
+          "variant": "Keripik Ubi Sweet Corn 45g",
+          "facings": 1,
+          "color_hint": "purple bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "1.5",
+      "section_label": "Shelf 1.5 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Taro tempe, Garuda corn snacks, Mr.Hottest Maitos, Maxicorn.",
+      "visual_fingerprint": "Taro logo, green and red bags, Garuda logo, blue bag, Mr.Hottest Maitos logo, red bag, Maxicorn logo, yellow and green bags, tempe, corn, tortilla chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Taro Tempe Himalayan Salt 50g",
+          "brand": "Taro",
+          "variant": "Tempe Himalayan Salt 50g",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Taro Tempe Sambal Matah 50g",
+          "brand": "Taro",
+          "variant": "Tempe Sambal Matah 50g",
+          "facings": 1,
+          "color_hint": "red bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Garuda Corn Tornado Sea Salt Pck 70g",
+          "brand": "Garuda",
+          "variant": "Corn Tornado Sea Salt Pck 70g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Mr.Hottest Maitos Sambal Balado 140g",
+          "brand": "Mr.Hottest Maitos",
+          "variant": "Sambal Balado 140g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Maxicorn Roasted Corn 140gr",
+          "brand": "Maxicorn",
+          "variant": "Roasted Corn 140gr",
+          "facings": 1,
+          "color_hint": "yellow bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Maxicorn Nacho Cheese 140gr",
+          "brand": "Maxicorn",
+          "variant": "Nacho Cheese 140gr",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "1.6",
+      "section_label": "Shelf 1.6 - Bottom",
+      "shelf_level": "bottom",
+      "description": "Happytos and Dua Kelinci Tos Tos tortilla chips.",
+      "visual_fingerprint": "Happytos logo, red and green bags, Tos Tos logo, yellow, green, and red bags, corn chips, tortilla chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Happytos Merah Corn Chips 140G",
+          "brand": "Happytos",
+          "variant": "Merah Corn Chips 140G",
+          "facings": 2,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Happytos Hijau Tortilla Chips 140G",
+          "brand": "Happytos",
+          "variant": "Hijau Tortilla Chips 140G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Dua Kelinci Tos Tos Original Pck 175g",
+          "brand": "Dua Kelinci Tos Tos",
+          "variant": "Original Pck 175g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Dua Kelinci Tos Tos Nacho Cheese 140g",
+          "brand": "Dua Kelinci Tos Tos",
+          "variant": "Nacho Cheese 140g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Dua Kelinci Tos Tos Korean BBQ 140g",
+          "brand": "Dua Kelinci Tos Tos",
+          "variant": "Korean BBQ 140g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.1",
+      "section_label": "Shelf 2.1 - Top",
+      "shelf_level": "top",
+      "description": "Mister Potato, Pringles, PotatoQ, Chitato chips.",
+      "visual_fingerprint": "Mister Potato logo, black and red cans, Pringles logo, red can, PotatoQ logo, green and red bags, Chitato logo, green bag, potato chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Mister Potato Ghost Pepper Original 40g",
+          "brand": "Mister Potato",
+          "variant": "Ghost Pepper Original 40g",
+          "facings": 1,
+          "color_hint": "black can with red label",
+          "size_hint": "tall slim can",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Mister Potato Chips Original 85g",
+          "brand": "Mister Potato",
+          "variant": "Chips Original 85g",
+          "facings": 1,
+          "color_hint": "red can with yellow label",
+          "size_hint": "tall slim can",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Pringles Original 102g",
+          "brand": "Pringles",
+          "variant": "Original 102g",
+          "facings": 1,
+          "color_hint": "red can with white logo",
+          "size_hint": "tall slim can",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "PotatoQ Chips Rasa Rumput Laut 50g",
+          "brand": "PotatoQ",
+          "variant": "Chips Rasa Rumput Laut 50g",
+          "facings": 2,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "PotatoQ Chips Rasa Sosis Meksiko 50g",
+          "brand": "PotatoQ",
+          "variant": "Chips Rasa Sosis Meksiko 50g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Chitato Lite Nori Seaweed 168gr",
+          "brand": "Chitato",
+          "variant": "Lite Nori Seaweed 168gr",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 7,
+          "product_name": "Chitato Sapi Panggang 168G",
+          "brand": "Chitato",
+          "variant": "Sapi Panggang 168G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.2",
+      "section_label": "Shelf 2.2 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Lay's and Chitato Lite chips.",
+      "visual_fingerprint": "Lay's logo, green bag, Chitato logo, green, blue, and yellow bags, seaweed, sour cream, ayam bawang flavors",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Lays Seaweed pck 64gr",
+          "brand": "Lay's",
+          "variant": "Seaweed pck 64gr",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Chitato Lite Nori Seaweed 65gr",
+          "brand": "Chitato",
+          "variant": "Lite Nori Seaweed 65gr",
+          "facings": 2,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Chitato Lite Rasa Aburi Seaweed 65g",
+          "brand": "Chitato",
+          "variant": "Lite Rasa Aburi Seaweed 65g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Chitato Lite Sour Cream 68gr",
+          "brand": "Chitato",
+          "variant": "Lite Sour Cream 68gr",
+          "facings": 1,
+          "color_hint": "yellow bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Chitato Lite Ayam Bawang 65g",
+          "brand": "Chitato",
+          "variant": "Lite Ayam Bawang 65g",
+          "facings": 1,
+          "color_hint": "yellow bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.3",
+      "section_label": "Shelf 2.3 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Chitato chips (Original, Mi Goreng, Tteokbokki, Ayam Bumbu, Sapi Bumbu Bakar, Sapi Bbq).",
+      "visual_fingerprint": "Chitato logo, red, green, and yellow bags, various flavors like original, mi goreng, tteokbokki, ayam bumbu, sapi",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Chitato Original 68G",
+          "brand": "Chitato",
+          "variant": "Original 68G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Chitato Mi Goreng 65G",
+          "brand": "Chitato",
+          "variant": "Mi Goreng 65G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Chitato Rose Tteokbokki 65G",
+          "brand": "Chitato",
+          "variant": "Rose Tteokbokki 65G",
+          "facings": 1,
+          "color_hint": "pink bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Chitato Ayam Bumbu 65G",
+          "brand": "Chitato",
+          "variant": "Ayam Bumbu 65G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Chitato Sapi Bumbu Bakar 65G",
+          "brand": "Chitato",
+          "variant": "Sapi Bumbu Bakar 65G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Chitato Sapi Bbq 65G",
+          "brand": "Chitato",
+          "variant": "Sapi Bbq 65G",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.4",
+      "section_label": "Shelf 2.4 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Oishi Suky, Jack N Jill Piattos, Lemonilo Chimi.",
+      "visual_fingerprint": "Oishi Suky logo, red and green bags, Jack N Jill Piattos logo, red and green bags, Lemonilo Chimi logo, yellow bag, various chips",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Oishi Suky Suky Manis Pedas 60g",
+          "brand": "Oishi Suky",
+          "variant": "Suky Manis Pedas 60g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Oishi Rasa Udang Pedas 60g",
+          "brand": "Oishi",
+          "variant": "Rasa Udang Pedas 60g",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Jack N Jill Piattos Sapi Panggang Pck65g",
+          "brand": "Jack N Jill Piattos",
+          "variant": "Sapi Panggang Pck65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Jack N Jill Piattos Big & Crispy Pck 68g",
+          "brand": "Jack N Jill Piattos",
+          "variant": "Big & Crispy Pck 68g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Jack N Jill Piattos Sambal Geprek 65g",
+          "brand": "Jack N Jill Piattos",
+          "variant": "Sambal Geprek 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Jack N Jill Piattos Sambal Matah 65g",
+          "brand": "Jack N Jill Piattos",
+          "variant": "Sambal Matah 65g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.5",
+      "section_label": "Shelf 2.5 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Tao Kae Noi seaweed and Mamasuka rumput laut.",
+      "visual_fingerprint": "Tao Kae Noi logo, green, red, and yellow packaging, Mamasuka logo, green and red bags, seaweed snacks",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Tao Kae Noi Big Sheet Chili Garlic 3.2G",
+          "brand": "Tao Kae Noi",
+          "variant": "Big Sheet Chili Garlic 3.2G",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Tao Kae Noi Big Sheet Classic 3.2G",
+          "brand": "Tao Kae Noi",
+          "variant": "Big Sheet Classic 3.2G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Tao Kae Noi Big Sheet Spicy 3.2G",
+          "brand": "Tao Kae Noi",
+          "variant": "Big Sheet Spicy 3.2G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Tao Kae Noi Big Roll Classic 3G",
+          "brand": "Tao Kae Noi",
+          "variant": "Big Roll Classic 3G",
+          "facings": 1,
+          "color_hint": "green cylindrical packaging",
+          "size_hint": "tall slim box",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Mamasuka Rumput Laut Pack 2X4.5G",
+          "brand": "Mamasuka",
+          "variant": "Rumput Laut Pack 2X4.5G",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Mamasuka Rumput Laut Pedas Pack 2X4.5G",
+          "brand": "Mamasuka",
+          "variant": "Rumput Laut Pedas Pack 2X4.5G",
+          "facings": 1,
+          "color_hint": "red bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "2.6",
+      "section_label": "Shelf 2.6 - Bottom",
+      "shelf_level": "bottom",
+      "description": "Joa Yo seaweed, Lidi Geli, Parahyangan Snacks.",
+      "visual_fingerprint": "Joa Yo logo, green bag, Lidi Geli logo, red and green bags, Parahyangan Snacks logo, various colors, makaroni, seblak, stik, basreng",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Joa Yo Seaweed Spicy Large Sheet Pck4.8g",
+          "brand": "Joa Yo",
+          "variant": "Seaweed Spicy Large Sheet Pck4.8g",
+          "facings": 1,
+          "color_hint": "green bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Lidi Geli BBQ 50Gr",
+          "brand": "Lidi Geli",
+          "variant": "BBQ 50Gr",
+          "facings": 2,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Lidi Geli Spicy 50Gr",
+          "brand": "Lidi Geli",
+          "variant": "Spicy 50Gr",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Parahyangan Snacks Makaroni Asin 70G",
+          "brand": "Parahyangan Snacks",
+          "variant": "Makaroni Asin 70G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Parahyangan Snacks Seblak Krtng Pck 75G",
+          "brand": "Parahyangan Snacks",
+          "variant": "Seblak Krtng Pck 75G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Parahyangan Snacks Stik Lada Pck 80G",
+          "brand": "Parahyangan Snacks",
+          "variant": "Stik Lada Pck 80G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 7,
+          "product_name": "Parahyangan Snacks Basreng Pck 190G",
+          "brand": "Parahyangan Snacks",
+          "variant": "Basreng Pck 190G",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.1",
+      "section_label": "Shelf 3.1 - Top",
+      "shelf_level": "top",
+      "description": "Potabee and Japota chips.",
+      "visual_fingerprint": "Potabee logo, red, green, and yellow bags, Japota logo, yellow bag, potato chips, honey butter, BBQ, grilled seaweed",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Potabee Potato Chips BBQ 65g",
+          "brand": "Potabee",
+          "variant": "Potato Chips BBQ 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Potabee Potato Chips BBQ 115g",
+          "brand": "Potabee",
+          "variant": "Potato Chips BBQ 115g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Potabee Grilled Seaweed Pck 115g",
+          "brand": "Potabee",
+          "variant": "Grilled Seaweed Pck 115g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Japota Happy Honey Butter Pck 120g",
+          "brand": "Japota",
+          "variant": "Happy Honey Butter Pck 120g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.2",
+      "section_label": "Shelf 3.2 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Potabee chips (Salted Egg, Ayam Bakar, Spicy BBQ, Wagyu Beef Steak, Seaweed).",
+      "visual_fingerprint": "Potabee logo, various colored bags (yellow, red, green, blue), potato chips, salted egg, ayam bakar, spicy bbq, wagyu beef, seaweed",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Potabee Selections Salted Egg Pck 68g",
+          "brand": "Potabee",
+          "variant": "Selections Salted Egg Pck 68g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Potabee Ayam Bakar Pck 68g",
+          "brand": "Potabee",
+          "variant": "Ayam Bakar Pck 68g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Potabee Spicy BBQ 65g",
+          "brand": "Potabee",
+          "variant": "Spicy BBQ 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Potabee Wagyu Beef Steak 65g",
+          "brand": "Potabee",
+          "variant": "Wagyu Beef Steak 65g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Potabee Potato Chips Seaweed 65g",
+          "brand": "Potabee",
+          "variant": "Potato Chips Seaweed 65g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.3",
+      "section_label": "Shelf 3.3 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "GuriBee Layer and Japota chips.",
+      "visual_fingerprint": "GuriBee logo, green and red bags, Japota logo, green, yellow, red, and blue bags, rumput laut, japanese seaweed, original, happy honey butter, nipis pedas, beef bbq",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "GuriBee Layer Rumput Laut 65g",
+          "brand": "GuriBee",
+          "variant": "Layer Rumput Laut 65g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Japota Umami Japanese Seaweed 68g",
+          "brand": "Japota",
+          "variant": "Umami Japanese Seaweed 68g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Japota Original 68G",
+          "brand": "Japota",
+          "variant": "Original 68G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Japota Happy Honey Butter 68g",
+          "brand": "Japota",
+          "variant": "Happy Honey Butter 68g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Japota Nipis Pedas 68gr",
+          "brand": "Japota",
+          "variant": "Nipis Pedas 68gr",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Japota Beef BBQ 68g",
+          "brand": "Japota",
+          "variant": "Beef BBQ 68g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.4",
+      "section_label": "Shelf 3.4 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "GuriBee Layer, Oishi Rin Bee, Dua Kelinci Roni, Mocabe Makaroni.",
+      "visual_fingerprint": "GuriBee logo, red and yellow bags, Oishi Rin Bee logo, yellow bag, Dua Kelinci Roni logo, red and green bags, Mocabe logo, red bag, various chips and makaroni",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "GuriBee Layer BBQ Balado 65g",
+          "brand": "GuriBee",
+          "variant": "Layer BBQ Balado 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Guribee Layers Keju Krispi 65g",
+          "brand": "Guribee",
+          "variant": "Layers Keju Krispi 65g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Oishi Rin Bee Keju 60g",
+          "brand": "Oishi Rin Bee",
+          "variant": "Keju 60g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Dua Kelinci Roni Makaroni RoastCorn135gr",
+          "brand": "Dua Kelinci Roni",
+          "variant": "Makaroni RoastCorn 135gr",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Dua Kelinci Roni Makaroni Ex Spicy 135gr",
+          "brand": "Dua Kelinci Roni",
+          "variant": "Makaroni Ex Spicy 135gr",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Mocabe Makaroni Sambal Geprek 70g",
+          "brand": "Mocabe",
+          "variant": "Makaroni Sambal Geprek 70g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.5",
+      "section_label": "Shelf 3.5 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Siantar Top French Fries, Krisbee, Delicyo, Kobe Boncabe.",
+      "visual_fingerprint": "Siantar Top logo, red and yellow bags, Krisbee logo, green bag, Delicyo logo, brown bag, Kobe Boncabe logo, red and yellow bags, french fries, makaroni, pangsit",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Siantar Top French Fries 62G",
+          "brand": "Siantar Top",
+          "variant": "French Fries 62G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Siantar Top French Fries Lv 3 60G",
+          "brand": "Siantar Top",
+          "variant": "French Fries Lv 3 60G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Krisbee French Fries 68g",
+          "brand": "Krisbee",
+          "variant": "French Fries 68g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Delicyo French Fries Truffle pck 38gr",
+          "brand": "Delicyo",
+          "variant": "French Fries Truffle pck 38gr",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Kobe Boncabe Makaroni Krispi Lv 15 135g",
+          "brand": "Kobe Boncabe",
+          "variant": "Makaroni Krispi Lv 15 135g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Kobe Boncabe Kulit Pangsit Lv10 70g",
+          "brand": "Kobe Boncabe",
+          "variant": "Kulit Pangsit Lv10 70g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "3.6",
+      "section_label": "Shelf 3.6 - Bottom",
+      "shelf_level": "bottom",
+      "description": "Siantar Top French Fries, Garuda Crunchy Sky Mix, Taro Net.",
+      "visual_fingerprint": "Siantar Top logo, red bag, Garuda Crunchy Sky Mix logo, green bag, Taro Net logo, green and red bags, french fries, sky mix, seaweed, potato bbq",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Siantar Top French Fries 130G",
+          "brand": "Siantar Top",
+          "variant": "French Fries 130G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Garuda Crunchy Sky Mix Pck 50+10g",
+          "brand": "Garuda Crunchy Sky Mix",
+          "variant": "Sky Mix Pck 50+10g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Taro Net Seaweed 62g",
+          "brand": "Taro Net",
+          "variant": "Seaweed 62g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Taro Net Seaweed 115g",
+          "brand": "Taro Net",
+          "variant": "Seaweed 115g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Taro Net Potato BBQ 115g",
+          "brand": "Taro Net",
+          "variant": "Potato BBQ 115g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.1",
+      "section_label": "Shelf 4.1 - Top",
+      "shelf_level": "top",
+      "description": "Chiki Balls, Cheetos, Twistko.",
+      "visual_fingerprint": "Chiki Balls logo, yellow and brown bags, Cheetos logo, orange and red bags, Twistko logo, red bag, cheese, coklat, roasted corn, jagung bakar",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Chiki Balls Cheese 200g",
+          "brand": "Chiki",
+          "variant": "Balls Cheese 200g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Chiki Balls Coklat 200g",
+          "brand": "Chiki",
+          "variant": "Balls Coklat 200g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Cheetos Cheese Pck 120gr",
+          "brand": "Cheetos",
+          "variant": "Cheese Pck 120gr",
+          "facings": 1,
+          "color_hint": "orange bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Cheetos Roasted Corn & Cheese Pck 120gr",
+          "brand": "Cheetos",
+          "variant": "Roasted Corn & Cheese Pck 120gr",
+          "facings": 1,
+          "color_hint": "red bag with orange logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Twistko Snack Jagung Bakar 145g",
+          "brand": "Twistko",
+          "variant": "Snack Jagung Bakar 145g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.2",
+      "section_label": "Shelf 4.2 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Smax Ring, Momogi, Chiki Balls, Chiki Twist.",
+      "visual_fingerprint": "Smax logo, red bag, Momogi logo, various colors, Chiki Balls logo, yellow bag, Chiki Twist logo, red bag, ring, mini stick, roasted corn, cheese",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Smax Ring Rasa Keju 40g",
+          "brand": "Smax",
+          "variant": "Ring Rasa Keju 40g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Momogi Classic Series 108 Gr",
+          "brand": "Momogi",
+          "variant": "Classic Series 108 Gr",
+          "facings": 1,
+          "color_hint": "various colored slim boxes",
+          "size_hint": "tall slim box",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Momogi Mini Stick Bite Roasted Corn 50g",
+          "brand": "Momogi",
+          "variant": "Mini Stick Bite Roasted Corn 50g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Chiki Balls Cheese 55g",
+          "brand": "Chiki",
+          "variant": "Balls Cheese 55g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Chiki Twist Roasted Corn Pck 120g",
+          "brand": "Chiki",
+          "variant": "Twist Roasted Corn Pck 120g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.3",
+      "section_label": "Shelf 4.3 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Jetz, Smax, Momogi, Chiki Balls, Cheetos.",
+      "visual_fingerprint": "Jetz logo, blue box, Smax logo, brown bag, Momogi logo, brown bag, Chiki Balls logo, brown and yellow bags, Cheetos logo, orange bag, choco fiesta, coklat, star bite, kaldu ayam",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Jetz Choco Fiesta Coklat 65g",
+          "brand": "Jetz",
+          "variant": "Choco Fiesta Coklat 65g",
+          "facings": 1,
+          "color_hint": "blue box with yellow logo",
+          "size_hint": "tall slim box",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Smax Ball Coklat 40g",
+          "brand": "Smax",
+          "variant": "Ball Coklat 40g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Momogi Star Bite Chocolate 50g",
+          "brand": "Momogi",
+          "variant": "Star Bite Chocolate 50g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Chiki Balls Coklat Pck 50g",
+          "brand": "Chiki",
+          "variant": "Balls Coklat Pck 50g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Chiki Balls Kaldu Ayam Pck 50g",
+          "brand": "Chiki",
+          "variant": "Balls Kaldu Ayam Pck 50g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Cheetos Cheese Pck 60gr",
+          "brand": "Cheetos",
+          "variant": "Cheese Pck 60gr",
+          "facings": 1,
+          "color_hint": "orange bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.4",
+      "section_label": "Shelf 4.4 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Chiki Twist and Puffs, Twistko.",
+      "visual_fingerprint": "Chiki Twist logo, red, yellow, and green bags, Chiki Puffs logo, yellow bag, Twistko logo, red bag, roasted corn, keju duo, flaming hot, jagung bakar pedas manis, cheddar cheese",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Chiki Twist Roasted Corn 75g",
+          "brand": "Chiki",
+          "variant": "Twist Roasted Corn 75g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Chiki Twist Keju Duo 70G",
+          "brand": "Chiki",
+          "variant": "Twist Keju Duo 70G",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Chiki Twist Flaming Hot 75g",
+          "brand": "Chiki",
+          "variant": "Twist Flaming Hot 75g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Chiki Twist Jagung Bakar Pedas Manis 65G",
+          "brand": "Chiki",
+          "variant": "Twist Jagung Bakar Pedas Manis 65G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Chiki Puffs Cheddar Cheese 60g",
+          "brand": "Chiki",
+          "variant": "Puffs Cheddar Cheese 60g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Twistko Snack Jagung Bakar 70G",
+          "brand": "Twistko",
+          "variant": "Snack Jagung Bakar 70G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.5",
+      "section_label": "Shelf 4.5 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Cem Cem Corn Shot, Oishi Pop Corn, Oishi Sponge Crunch, Oishi Pillows.",
+      "visual_fingerprint": "Cem Cem logo, brown and green bags, Oishi Pop Corn logo, yellow and blue bags, Oishi Sponge Crunch logo, brown bag, Oishi Pillows logo, brown and purple bags, corn shot, popcorn, sponge crunch, pillows",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Cem Cem Corn Shot Cokelat 55G",
+          "brand": "Cem Cem",
+          "variant": "Corn Shot Cokelat 55G",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Cem Cem Corn Shot Ayam Goreng 55G",
+          "brand": "Cem Cem",
+          "variant": "Corn Shot Ayam Goreng 55G",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Cem Cem Pop Corn Chocolate 55g",
+          "brand": "Cem Cem",
+          "variant": "Pop Corn Chocolate 55g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Oishi Pop Corn Caramel 100g",
+          "brand": "Oishi",
+          "variant": "Pop Corn Caramel 100g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Oishi Pop Corn Belgian Butter 100gr",
+          "brand": "Oishi",
+          "variant": "Pop Corn Belgian Butter 100gr",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Oishi Sponge Crunch Coklat 100g",
+          "brand": "Oishi",
+          "variant": "Sponge Crunch Coklat 100g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 7,
+          "product_name": "Oishi Pillows Coklat 100g",
+          "brand": "Oishi",
+          "variant": "Pillows Coklat 100g",
+          "facings": 1,
+          "color_hint": "brown bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 8,
+          "product_name": "Oishi Pillows Ubi 100g",
+          "brand": "Oishi",
+          "variant": "Pillows Ubi 100g",
+          "facings": 1,
+          "color_hint": "purple bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "4.6",
+      "section_label": "Shelf 4.6 - Bottom",
+      "shelf_level": "bottom",
+      "description": "Gemez, Spix, Mie Kremezz, Wonhae Topokki, Chiki Popcorn.",
+      "visual_fingerprint": "Gemez logo, red bag, Spix logo, yellow and green bags, Mie Kremezz logo, red bag, Wonhae logo, red and blue bags, Chiki Popcorn logo, yellow bag, mie, topokki, popcorn",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Gemez Mie Enaak 22g",
+          "brand": "Gemez",
+          "variant": "Mie Enaak 22g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "small flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Spix Soba Mie Chicken 21g",
+          "brand": "Spix",
+          "variant": "Soba Mie Chicken 21g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "small flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Spix Mie Goreng 50g",
+          "brand": "Spix",
+          "variant": "Mie Goreng 50g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "small flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Mie Kremezz Rasa Mie Goreng 30G",
+          "brand": "Mie Kremezz",
+          "variant": "Rasa Mie Goreng 30G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "small flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Wonhae TopokkiSnackChesee Buldak Pck80gr",
+          "brand": "Wonhae",
+          "variant": "Topokki Snack Cheese Buldak Pck80gr",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Wonhae Topokki Snack Creamy Rose 80g",
+          "brand": "Wonhae",
+          "variant": "Topokki Snack Creamy Rose 80g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 7,
+          "product_name": "Chiki Popcorn Salted Caramel Pck 72gr",
+          "brand": "Chiki Popcorn",
+          "variant": "Salted Caramel Pck 72gr",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.1",
+      "section_label": "Shelf 5.1 - Top",
+      "shelf_level": "top",
+      "description": "Mayasi, Tong Garden, Mr P, Dua Kelinci nuts.",
+      "visual_fingerprint": "Mayasi logo, red bag, Tong Garden logo, yellow and blue cans, Mr P logo, red bag, Dua Kelinci logo, green and red bags, kacang jepang, cashew nuts, almonds, mix nuts, kacang koro",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Mayasi Kacang Jepang Pedas 65g",
+          "brand": "Mayasi",
+          "variant": "Kacang Jepang Pedas 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Tong Garden Salted Cashew Nut40g",
+          "brand": "Tong Garden",
+          "variant": "Salted Cashew Nut 40g",
+          "facings": 1,
+          "color_hint": "yellow can with green label",
+          "size_hint": "small can",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Tong Garden Salted Almonds 35g",
+          "brand": "Tong Garden",
+          "variant": "Salted Almonds 35g",
+          "facings": 1,
+          "color_hint": "blue can with yellow label",
+          "size_hint": "small can",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Mr P Madu 80G",
+          "brand": "Mr P",
+          "variant": "Madu 80G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Dua Kelinci Mix Nuts 60g",
+          "brand": "Dua Kelinci",
+          "variant": "Mix Nuts 60g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 6,
+          "product_name": "Dua Kelinci Kacang Koro Pedas 60G",
+          "brand": "Dua Kelinci",
+          "variant": "Kacang Koro Pedas 60G",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.2",
+      "section_label": "Shelf 5.2 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Mayasi and Garuda Pilus.",
+      "visual_fingerprint": "Mayasi logo, red, green, and yellow bags, Garuda Pilus logo, red and green bags, koro, kacang jepang, mie goreng, pedas",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Mayasi Koro Pedas 65g",
+          "brand": "Mayasi",
+          "variant": "Koro Pedas 65g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Mayasi Kacang Jepang Roasted Corn 65g",
+          "brand": "Mayasi",
+          "variant": "Kacang Jepang Roasted Corn 65g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Mayasi Kacang Jepang Garlic 65g",
+          "brand": "Mayasi",
+          "variant": "Kacang Jepang Garlic 65g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Garuda Pilus Mie Goreng Pck 80g",
+          "brand": "Garuda Pilus",
+          "variant": "Mie Goreng Pck 80g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Garuda Pilus Pedas Pck 80g",
+          "brand": "Garuda Pilus",
+          "variant": "Pedas Pck 80g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.3",
+      "section_label": "Shelf 5.3 - Upper-mid",
+      "shelf_level": "upper-mid",
+      "description": "Dua Kelinci Sukro and Garuda Pilus.",
+      "visual_fingerprint": "Dua Kelinci Sukro logo, red, green, and yellow bags, Garuda Pilus logo, red bag, BBQ, tic tac, mie goreng, mix, sapi panggang",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Dua Kelinci Sukro BBQ 95g",
+          "brand": "Dua Kelinci Sukro",
+          "variant": "BBQ 95g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Dua Kelinci Tic Tac Mi Goreng 80g",
+          "brand": "Dua Kelinci",
+          "variant": "Tic Tac Mi Goreng 80g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Dua Kelinci Tic Tac Mix 80g",
+          "brand": "Dua Kelinci",
+          "variant": "Tic Tac Mix 80g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Dua Kelinci Tic Tac Sapi Panggang 80g",
+          "brand": "Dua Kelinci",
+          "variant": "Tic Tac Sapi Panggang 80g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Garuda Pilus Sapi Panggang Pck 80g",
+          "brand": "Garuda Pilus",
+          "variant": "Sapi Panggang Pck 80g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.4",
+      "section_label": "Shelf 5.4 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Garuda Kacang Atom, Dua Kelinci Sukro, Garuda Rosta.",
+      "visual_fingerprint": "Garuda Kacang Atom logo, red and green bags, Dua Kelinci Sukro logo, yellow bag, Garuda Rosta logo, red bag, original, pedas, bawang",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Garuda Kacang Atom Original Pck 100g",
+          "brand": "Garuda Kacang Atom",
+          "variant": "Original Pck 100g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Dua Kelinci Sukro 95g",
+          "brand": "Dua Kelinci Sukro",
+          "variant": "Original 95g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Garuda Kacang Atom Pedas Pck220g",
+          "brand": "Garuda Kacang Atom",
+          "variant": "Pedas Pck220g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Dua Kelinci Sukro Oven Bawang 95g",
+          "brand": "Dua Kelinci Sukro",
+          "variant": "Oven Bawang 95g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Garuda Rosta Kacang Panggang Pds Pck95g",
+          "brand": "Garuda Rosta",
+          "variant": "Kacang Panggang Pedas Pck95g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.5",
+      "section_label": "Shelf 5.5 - Lower-mid",
+      "shelf_level": "lower-mid",
+      "description": "Garuda Rosta, Dua Kelinci Sukro, Garuda Kacang Telur, Garuda Kacang Kulit.",
+      "visual_fingerprint": "Garuda Rosta logo, yellow bag, Dua Kelinci Sukro logo, yellow bag, Garuda Kacang Telur logo, red bag, Garuda Kacang Kulit logo, green and red bags, kacang panggang, jagung bakar, telur, kulit",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Garuda Rosta Kac Panggang Bawang Pck100g",
+          "brand": "Garuda Rosta",
+          "variant": "Kacang Panggang Bawang Pck100g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Dua kelinci Sukro Oven Jagung Bakar 95g",
+          "brand": "Dua Kelinci Sukro",
+          "variant": "Oven Jagung Bakar 95g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Garuda Kacang Telur Pck210g",
+          "brand": "Garuda",
+          "variant": "Kacang Telur Pck210g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Garuda Kacang Kulit Pck 160g",
+          "brand": "Garuda",
+          "variant": "Kacang Kulit Pck 160g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Dua Kelinci Kacang Kulit Garing Pck 180g",
+          "brand": "Dua Kelinci",
+          "variant": "Kacang Kulit Garing Pck 180g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "5.6",
+      "section_label": "Shelf 5.6 - Bottom",
+      "shelf_level": "bottom",
+      "description": "Rebo and Fuzo kuaci.",
+      "visual_fingerprint": "Rebo logo, green, yellow, and blue bags, Fuzo logo, yellow and red bags, kuaci, original, green tea, milk, susu",
+      "products": [
+        {
+          "position": 1,
+          "product_name": "Rebo Kuaci Original 120g",
+          "brand": "Rebo",
+          "variant": "Kuaci Original 120g",
+          "facings": 1,
+          "color_hint": "green bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 2,
+          "product_name": "Rebo Kuaci Green Tea 120g",
+          "brand": "Rebo",
+          "variant": "Kuaci Green Tea 120g",
+          "facings": 1,
+          "color_hint": "yellow bag with green logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 3,
+          "product_name": "Rebo Kuaci Milk 120g",
+          "brand": "Rebo",
+          "variant": "Kuaci Milk 120g",
+          "facings": 1,
+          "color_hint": "blue bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 4,
+          "product_name": "Dua Kelinci Kuaci Fuzo Original 140g",
+          "brand": "Dua Kelinci Fuzo",
+          "variant": "Kuaci Original 140g",
+          "facings": 1,
+          "color_hint": "yellow bag with red logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        },
+        {
+          "position": 5,
+          "product_name": "Dua Kelinci Kuaci Fuzo Susu 150g",
+          "brand": "Dua Kelinci Fuzo",
+          "variant": "Kuaci Susu 150g",
+          "facings": 1,
+          "color_hint": "red bag with yellow logo",
+          "size_hint": "wide flat bag",
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "total_products": 170,
+  "extracted_at": "2024-07-29T12:00:00Z"
+}

@@ -1,0 +1,329 @@
+"""
+vision_checker.py
+-----------------
+Two clearly separated responsibilities:
+
+  [AI]   Gemini looks at the shelf photo BLINDLY — no planogram hints given.
+         It only reports what it actually sees. Nothing more.
+
+  [Code] Python compares the blind detection against the planogram JSON.
+
+Root cause of hallucination (fixed):
+  Giving Gemini the planogram product list as a "hint" caused it to
+  confirm products from the list even if they weren't in the photo.
+  Now Gemini detects with zero knowledge of what should be there.
+
+Output fields:
+  found_on_shelf     : in planogram AND detected in photo  ✅
+  missing_from_shelf : in planogram but NOT in photo       ❌
+  not_in_planogram   : detected in photo but NOT in planogram ⚠️
+"""
+
+from google import genai
+from google.genai import types
+from pydantic import BaseModel
+from datetime import datetime
+from dotenv import load_dotenv
+from difflib import SequenceMatcher
+from typing import List
+import os
+import json
+
+from pdf_extractor import extract_planogram
+
+
+# ── Pydantic schema for Gemini structured output ──────────────────────────────
+
+class DetectedProduct(BaseModel):
+    product_name: str
+    brand:        str
+    color_hint:   str
+    confidence:   int   # 0-100
+
+class DetectionResult(BaseModel):
+    detected: List[DetectedProduct]
+
+load_dotenv()
+
+SYSTEM_PROMPT = """
+You are a shelf scanning system for a retail store.
+Your only job: look at the photo and report exactly what products you can see.
+Do NOT guess. Do NOT assume. Only report what is clearly visible.
+If a label is unreadable, describe the packaging visually instead of guessing a name.
+Return JSON only.
+"""
+
+# Raise threshold to reduce false matches — 0.70 means names must be 70% similar
+MATCH_THRESHOLD = 0.70
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _parse_json(text: str) -> dict:
+    raw = text.strip()
+    if raw.startswith("```"):
+        parts = raw.split("```")
+        raw = parts[1] if len(parts) > 1 else raw
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        # Response was truncated — extract whatever completed objects exist
+        print(f"[parser] JSON truncated at char {e.pos}. Attempting partial recovery...")
+        try:
+            # Find the last complete JSON object in the detected array
+            cutoff = raw.rfind("},")
+            if cutoff > 0:
+                partial = raw[:cutoff + 1] + "]}"
+                return json.loads(partial)
+        except Exception:
+            pass
+        # Nothing recoverable
+        print(f"[parser] Could not recover partial JSON. Raw snippet: {raw[:200]}")
+        return {"detected": []}
+
+
+def _similarity(a: str, b: str) -> float:
+    """Fuzzy string similarity 0.0–1.0."""
+    a = a.lower().strip()
+    b = b.lower().strip()
+
+    if a == b:
+        return 1.0
+    if a in b or b in a:
+        return 0.85
+
+    a_words = set(a.split())
+    b_words = set(b.split())
+    common  = a_words & b_words
+    if len(common) >= 2:
+        word_score = len(common) / max(len(a_words), len(b_words))
+        return max(word_score, SequenceMatcher(None, a, b).ratio())
+
+    return SequenceMatcher(None, a, b).ratio()
+
+
+def _get_planogram_products(planogram_data: dict) -> list:
+    seen, products = set(), []
+    for sec in planogram_data.get("gondola_sections", []):
+        for p in sec.get("products", []):
+            key = p["product_name"].lower().strip()
+            if key not in seen:
+                seen.add(key)
+                products.append({
+                    "product_name": p["product_name"],
+                    "brand":        p["brand"],
+                    "color_hint":   p.get("color_hint", ""),
+                    "size_hint":    p.get("size_hint", ""),
+                    "section_id":   sec["section_id"],
+                })
+    return products
+
+
+# ── Step 1 (AI): Blind detection — NO planogram hints ────────────────────────
+
+def _image_to_json(client, image_part: types.Part) -> list:
+    """
+    Gemini scans the shelf photo with ZERO knowledge of the planogram.
+    Uses response_schema to guarantee valid, complete JSON output.
+    No hints. No reference list. Blind detection only.
+    """
+    prompt = """
+Scan this retail shelf photo carefully — top to bottom, left to right.
+List every product you can clearly see.
+
+Rules:
+- Only report products that are CLEARLY VISIBLE in the photo
+- Do NOT guess or invent products — only what you can actually see
+- Read the label as printed on the packaging
+- If a label is blurry, set confidence below 50 and describe the packaging visually
+- product_name : name as printed on packaging
+- brand        : brand name as printed on packaging
+- color_hint   : dominant packaging color
+- confidence   : 100 = clearly readable, 60 = partially visible, 30 = mostly guessing
+"""
+
+    response = client.models.generate_content(
+        model="gemini-2.5-pro",
+        contents=["SHELF PHOTO:", image_part, prompt],
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            response_mime_type="application/json",
+            response_schema=DetectionResult,   # enforces valid JSON structure
+            temperature=0.0,
+        ),
+    )
+
+    # response_schema guarantees valid JSON — use .parsed if available
+    if response.parsed:
+        detected = [p.model_dump() for p in response.parsed.detected]
+    else:
+        data     = _parse_json(response.text)
+        detected = data.get("detected", [])
+
+    print(f"\n[step-1] Gemini raw detection — {len(detected)} products seen in photo:")
+    for p in detected:
+        flag = "✓" if p["confidence"] >= 60 else "~"
+        print(f"  {flag} {p['product_name']} | {p['brand']} | {p['color_hint']} | conf: {p['confidence']}%")
+
+    # Drop very low confidence detections (likely hallucinations)
+    reliable = [p for p in detected if p["confidence"] >= 50]
+    dropped  = len(detected) - len(reliable)
+    if dropped:
+        print(f"\n[step-1] Dropped {dropped} low-confidence detection(s) (< 50%)")
+
+    return reliable
+
+
+# ── Step 2 (Code): Compare detected JSON vs planogram JSON ────────────────────
+
+def _compare(detected: list, planogram_products: list) -> dict:
+    """
+    Pure Python comparison — no AI, no hallucination possible.
+
+    For each planogram product, find the closest match in the detected list.
+    Only counts as a match if similarity >= MATCH_THRESHOLD.
+    """
+    found_on_shelf     = []
+    missing_from_shelf = []
+    not_in_planogram   = []
+
+    matched_detected_indices = set()
+
+    print(f"\n[step-2] Matching {len(detected)} detected → {len(planogram_products)} planogram products")
+    print(f"         Match threshold: {MATCH_THRESHOLD}\n")
+
+    for plan_p in planogram_products:
+        best_score = 0.0
+        best_idx   = -1
+        best_name  = ""
+
+        for i, det_p in enumerate(detected):
+            score = _similarity(plan_p["product_name"], det_p["product_name"])
+
+            # Small brand match boost
+            pb = plan_p["brand"].lower()
+            db = det_p["brand"].lower()
+            if pb and db and (pb in db or db in pb):
+                score = min(1.0, score + 0.10)
+
+            if score > best_score:
+                best_score = score
+                best_idx   = i
+                best_name  = det_p["product_name"]
+
+        if best_score >= MATCH_THRESHOLD and best_idx != -1:
+            found_on_shelf.append(plan_p["product_name"])
+            matched_detected_indices.add(best_idx)
+            match_note = f" ← matched '{best_name}'" if best_name.lower() != plan_p["product_name"].lower() else ""
+            print(f"  ✅ FOUND   : {plan_p['product_name']}{match_note} (score: {best_score:.2f})")
+        else:
+            missing_from_shelf.append(plan_p["product_name"])
+            print(f"  ❌ MISSING : {plan_p['product_name']}"
+                  + (f" (closest: '{best_name}' score: {best_score:.2f})" if best_name else ""))
+
+    for i, det_p in enumerate(detected):
+        if i not in matched_detected_indices:
+            not_in_planogram.append(det_p["product_name"])
+            print(f"  ⚠️  EXTRA  : {det_p['product_name']} [{det_p['brand']}] — not in planogram")
+
+    total            = len(planogram_products)
+    n_found          = len(found_on_shelf)
+    compliance_score = round((n_found / total * 100)) if total > 0 else 0
+    status           = "pass" if compliance_score >= 80 else "fail"
+
+    summary_parts = [
+        f"{n_found} of {total} planogram products found on shelf ({compliance_score}% compliance)."
+    ]
+    if missing_from_shelf:
+        preview = ", ".join(missing_from_shelf[:3])
+        extra   = f" and {len(missing_from_shelf) - 3} more" if len(missing_from_shelf) > 3 else ""
+        summary_parts.append(f"Missing: {preview}{extra}.")
+    if not_in_planogram:
+        summary_parts.append(
+            f"{len(not_in_planogram)} product(s) on shelf not in planogram."
+        )
+
+    return {
+        "found_on_shelf":     found_on_shelf,
+        "missing_from_shelf": missing_from_shelf,
+        "not_in_planogram":   not_in_planogram,
+        "compliance_score":   compliance_score,
+        "status":             status,
+        "summary":            " ".join(summary_parts),
+    }
+
+
+# ── Public entry point ────────────────────────────────────────────────────────
+
+def check_compliance(
+    pdf_path: str,
+    shelf_photo_bytes: bytes,
+    planogram_id: str,
+    store_id: str,
+    image_media_type: str = "image/jpeg",
+) -> dict:
+    print(f"\n[vision_checker] ── Check: {planogram_id} / {store_id} ──")
+
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not set.")
+        client = genai.Client(api_key=api_key)
+
+        # Load planogram reference
+        print("[vision_checker] Loading planogram JSON...")
+        planogram_data     = extract_planogram(pdf_path)
+        planogram_products = _get_planogram_products(planogram_data)
+        print(f"[vision_checker] {len(planogram_products)} unique products in planogram.")
+
+        # Prepare image
+        image_part = types.Part.from_bytes(
+            data=shelf_photo_bytes,
+            mime_type=image_media_type,
+        )
+
+        # Step 1: Gemini blind detection → JSON
+        print("[vision_checker] Step 1 — Blind scan (no hints given to AI)...")
+        detected = _image_to_json(client, image_part)
+
+        # Step 2: Python comparison
+        print("[vision_checker] Step 2 — Python comparing against planogram...")
+        result = _compare(detected, planogram_products)
+
+        print(
+            f"\n[vision_checker] ── Final Result ──\n"
+            f"  found_on_shelf     : {len(result['found_on_shelf'])}\n"
+            f"  missing_from_shelf : {len(result['missing_from_shelf'])}\n"
+            f"  not_in_planogram   : {len(result['not_in_planogram'])}\n"
+            f"  compliance_score   : {result['compliance_score']}%\n"
+            f"  status             : {result['status']}"
+        )
+
+        return {
+            "planogram_id":       planogram_id,
+            "store_id":           store_id,
+            "status":             result["status"],
+            "compliance_score":   result["compliance_score"],
+            "found_on_shelf":     result["found_on_shelf"],
+            "missing_from_shelf": result["missing_from_shelf"],
+            "not_in_planogram":   result["not_in_planogram"],
+            "summary":            result["summary"],
+            "timestamp":          datetime.utcnow().isoformat() + "Z",
+        }
+
+    except Exception as e:
+        print(f"[vision_checker] ERROR: {e}")
+        return {
+            "planogram_id":       planogram_id,
+            "store_id":           store_id,
+            "status":             "error",
+            "compliance_score":   0,
+            "found_on_shelf":     [],
+            "missing_from_shelf": [],
+            "not_in_planogram":   [],
+            "summary":            f"AI Engine Error: {str(e)}",
+            "timestamp":          datetime.utcnow().isoformat() + "Z",
+        }
