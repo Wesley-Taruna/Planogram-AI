@@ -76,9 +76,10 @@ def health_check():
 @app.post("/check")
 async def check_planogram(
     background_tasks: BackgroundTasks,
-    planogram_id: str = Form(..., description="Planogram file ID, e.g. SNACK2C"),
+    planogram_id: str = Form(..., description="Planogram file ID, e.g. SNACK3C"),
     store_id: str = Form(..., description="Store ID, e.g. FM-CIBUBUR-001"),
     shelf_photo: UploadFile = File(..., description="Photo of the actual shelf taken by supervisor"),
+    section_id: str = Form(None, description="Optional: target a specific section, e.g. 1.2. If omitted, checks all sections."),
 ):
     """
     Main endpoint. Receives:
@@ -104,7 +105,7 @@ async def check_planogram(
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail=f"Planogram PDF {planogram_id}.pdf not found.")
 
-    # Run Gemini Vision compliance check
+    # Run Claude Vision compliance check
     try:
         result = check_compliance(
             pdf_path=str(pdf_path),
@@ -112,6 +113,7 @@ async def check_planogram(
             planogram_id=planogram_id,
             store_id=store_id,
             image_media_type=shelf_photo.content_type,
+            target_section_id=section_id if section_id else None,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI check error: {str(e)}")
