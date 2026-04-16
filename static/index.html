@@ -1,0 +1,4222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planogram AI Engine — FamilyMart Indonesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00843D;
+  --green-light: #00A84F;
+  --green-pale: #E8F5EE;
+  --green-dim: #D0EDDA;
+  --red: #D32F2F;
+  --red-pale: #FEECEC;
+  --amber: #B45309;
+  --amber-pale: #FEF3CD;
+  --blue: #1565C0;
+  --blue-pale: #E8F0FE;
+  --pink: #9C27B0;
+  --pink-pale: #F3E5F5;
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #CED4DA;
+  --gray-500: #ADB5BD;
+  --gray-600: #6C757D;
+  --gray-700: #495057;
+  --gray-800: #343A40;
+  --gray-900: #212529;
+  --surface: #FFFFFF;
+  --bg: #F4F6F4;
+  --border: #E0E7E0;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+code, .mono { font-family: 'DM Mono', monospace; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--gray-900);
+}
+.fm-badge {
+  background: var(--green);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.topbar-nav { display: flex; gap: 6px; align-items: center; }
+.nav-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--gray-700);
+  transition: all 0.15s;
+}
+.nav-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+.nav-btn.active { background: var(--green-pale); color: var(--green); border-color: var(--green-dim); font-weight: 500; }
+.nav-btn.primary {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+  font-weight: 500;
+}
+.nav-btn.primary:hover { background: var(--green-light); }
+
+/* ── LAYOUT ── */
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card-sm { padding: 14px 16px; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #003d1c 0%, #00572a 50%, #006b34 100%);
+  border-radius: var(--radius-lg);
+  padding: 40px 40px 36px;
+  color: white;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: -40px;
+  width: 220px; height: 220px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 20%;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* Collapse photo on small screens */
+@media (max-width: 860px) {
+  .hero #heroStoreImg,
+  .hero #heroPlaceholder { display: none !important; }
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+.hero h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+.hero p { font-size: 15px; opacity: 0.8; max-width: 540px; margin-bottom: 24px; }
+.hero-stats { display: flex; gap: 32px; }
+.hero-stat span { display: block; }
+.hero-stat .num { font-size: 26px; font-weight: 700; }
+.hero-stat .lbl { font-size: 12px; opacity: 0.65; margin-top: -2px; }
+.hero-actions { display: flex; gap: 10px; margin-top: 24px; }
+.hero-btn {
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.hero-btn.white { background: white; color: var(--green); }
+.hero-btn.white:hover { background: #f0f0f0; }
+.hero-btn.outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.4); }
+.hero-btn.outline:hover { background: rgba(255,255,255,0.1); }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+
+/* ── SECTION LABELS ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+/* ── TAGS / BADGES ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.tag-green { background: var(--green-pale); color: var(--green); }
+.tag-red { background: var(--red-pale); color: var(--red); }
+.tag-amber { background: var(--amber-pale); color: var(--amber); }
+.tag-blue { background: var(--blue-pale); color: var(--blue); }
+.tag-gray { background: var(--gray-100); color: var(--gray-600); }
+.tag-purple { background: var(--pink-pale); color: var(--pink); }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-pale); color: var(--green); }
+.badge-red { background: var(--red-pale); color: var(--red); }
+.badge-amber { background: var(--amber-pale); color: var(--amber); }
+.badge-blue { background: var(--blue-pale); color: var(--blue); }
+
+/* ── FORMS ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--gray-700); margin-bottom: 5px; display: block; }
+.form-select, .form-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--gray-900);
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,132,61,0.1);
+}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--green); background: var(--green-pale); }
+.upload-zone.has-file { border-color: var(--green); background: var(--green-pale); border-style: solid; }
+.upload-zone input[type=file] { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--gray-500); }
+
+/* ── PHOTO GRID (Full Gondola Upload) ── */
+.photo-grid {
+  display: grid;
+  gap: 8px;
+}
+.photo-grid-header {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  padding: 6px 4px;
+  background: var(--green-pale);
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+.photo-slot {
+  border: 2px dashed var(--gray-300);
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: var(--gray-50);
+}
+.photo-slot:hover { border-color: var(--green); background: var(--green-pale); }
+.photo-slot.has-photo {
+  border-color: var(--green);
+  background: var(--green-pale);
+  border-style: solid;
+}
+.photo-slot .slot-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+.photo-slot .slot-icon { font-size: 22px; margin-bottom: 3px; }
+.photo-slot .slot-hint {
+  font-size: 9px;
+  color: var(--gray-400);
+  line-height: 1.3;
+}
+.photo-slot.has-photo .slot-label { color: var(--green); }
+.photo-slot.has-photo .slot-hint { color: var(--green); }
+.photo-slot input[type=file] { display: none; }
+.photo-slot .slot-thumb {
+  width: 100%;
+  max-height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+/* Gondola preview grid */
+.gondola-preview-grid {
+  display: grid;
+  gap: 4px;
+}
+.gondola-preview-cell {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 4px 3px;
+  text-align: center;
+  font-size: 8px;
+  color: var(--gray-600);
+  line-height: 1.3;
+  overflow: hidden;
+}
+.gondola-preview-cell.header {
+  background: var(--green-pale);
+  color: var(--green);
+  font-weight: 700;
+  font-size: 10px;
+  border-color: var(--green-dim);
+}
+
+/* ── PRODUCT STATUS BOXES (compliance visual grid) ── */
+.prod-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.prod-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1.5px solid transparent;
+  font-size: 11px;
+  line-height: 1.35;
+  max-width: 160px;
+  min-width: 110px;
+  flex: 1 1 110px;
+  position: relative;
+}
+.prod-box.found {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+  color: #15803D;
+}
+.prod-box.missing {
+  background: #FFF1F2;
+  border-color: #FCA5A5;
+  border-style: dashed;
+  color: #B91C1C;
+}
+.prod-box.unexpected {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+.prod-box-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.prod-box-name {
+  font-weight: 500;
+  word-break: break-word;
+}
+/* Section visual card */
+.section-visual-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.section-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.section-visual-body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0;
+}
+.section-photo-pane {
+  background: #0f172a;
+  position: relative;
+  min-height: 130px;
+  border-right: 1px solid var(--border);
+}
+.section-photo-pane canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.section-photo-pane .no-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 130px;
+  color: rgba(255,255,255,0.3);
+  font-size: 11px;
+  text-align: center;
+  padding: 10px;
+}
+.section-products-pane {
+  padding: 10px 12px;
+}
+
+/* ── STEP WIZARD ── */
+.wizard { display: flex; align-items: flex-start; gap: 0; margin-bottom: 28px; }
+.wizard-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.wizard-step::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 1.5px;
+  background: var(--border);
+}
+.wizard-step:last-child::after { display: none; }
+.wdot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  z-index: 1;
+  transition: all 0.2s;
+}
+.wdot.idle { background: var(--gray-100); color: var(--gray-500); border: 1.5px solid var(--border); }
+.wdot.active { background: var(--green-pale); color: var(--green); border: 2px solid var(--green); }
+.wdot.done { background: var(--green); color: white; border: 2px solid var(--green); }
+.wlabel { font-size: 11px; color: var(--gray-500); margin-top: 6px; text-align: center; font-weight: 500; }
+.wlabel.active { color: var(--green); }
+.wizard-step.active::after { background: var(--green-dim); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+.btn-primary { background: var(--green); color: white; border-color: var(--green); }
+.btn-primary:hover { background: var(--green-light); border-color: var(--green-light); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { background: var(--red-pale); color: var(--red); border-color: #F5C6C6; }
+.btn-danger:hover { background: #FDD; }
+
+/* ── SHELF GRID ── */
+.shelf-section { margin-bottom: 10px; }
+.shelf-row-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-500);
+  padding: 4px 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shelf-slots {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.slot {
+  min-width: 74px;
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 5px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--gray-600);
+  background: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  line-height: 1.3;
+  gap: 2px;
+  transition: all 0.15s;
+}
+.slot-num { font-size: 9px; color: var(--gray-400); font-weight: 600; }
+.slot.correct { background: #F0FBF4; border-color: #86EFAC; color: #166534; }
+.slot.missing { background: var(--red-pale); border-color: #FCA5A5; border-style: dashed; color: var(--red); }
+.slot.misplaced { background: #FDF2F8; border-color: #F9A8D4; color: #86198F; }
+.slot.unexpected { background: var(--amber-pale); border-color: #FCD34D; color: var(--amber); }
+.slot-status { font-size: 9px; font-weight: 700; }
+
+/* ── PDF PLANOGRAM VIEWER ── */
+.pdf-viewer {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.pdf-hdr {
+  background: linear-gradient(135deg, #162916, #223622);
+  color: white;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.pdf-hdr-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
+.pdf-hdr-sub { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.pdf-hdr-right { text-align: right; }
+.pdf-hdr-meta { font-size: 10px; color: rgba(255,255,255,0.55); line-height: 1.8; }
+.pdf-slides-wrap { position: relative; overflow: hidden; }
+.pdf-slide { display: none; }
+.pdf-slide.active { display: block; }
+.pdf-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--gray-50);
+}
+.pdf-nav-btn {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--gray-700);
+  font-family: 'Sora', sans-serif;
+  transition: all 0.12s;
+}
+.pdf-nav-btn:hover:not(:disabled) { background: var(--gray-100); border-color: var(--gray-400); }
+.pdf-nav-btn:disabled { opacity: 0.3; cursor: default; }
+.pdf-page-ind {
+  font-size: 11px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gray-300); display: inline-block; transition: background 0.2s; }
+.pdf-dot.on { background: var(--green); }
+/* Shelf diagram slide */
+.pdf-shelf-diagram { padding: 12px 14px 8px; overflow-y: auto; max-height: 370px; }
+.pdf-shelf-row { display: flex; align-items: stretch; margin-bottom: 5px; }
+.pdf-row-lbl {
+  width: 80px; flex-shrink: 0;
+  font-size: 9px; font-weight: 600; color: var(--gray-600);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-right: 8px; text-align: right; padding-bottom: 7px; line-height: 1.4;
+}
+.pdf-row-lbl .rh { font-size: 8px; color: var(--gray-400); font-weight: 400; font-family: 'DM Mono', monospace; }
+.pdf-shelf-prods {
+  flex: 1; border-bottom: 3px solid #9aab9a; padding-bottom: 5px;
+  display: flex; gap: 3px; align-items: flex-end; overflow-x: auto;
+}
+.pdf-pblock {
+  border: 1px solid; border-radius: 5px; padding: 4px 5px;
+  min-width: 50px; flex: 1; display: flex; align-items: center;
+  justify-content: center; min-height: 44px;
+}
+.pdf-pname { font-size: 8px; font-weight: 600; text-align: center; line-height: 1.35; }
+/* Position table slide */
+.pdf-tbl-wrap { overflow-y: auto; max-height: 370px; }
+.pdf-tbl {
+  width: 100%; border-collapse: collapse; font-size: 10.5px;
+}
+.pdf-tbl thead th {
+  background: #eef3ee; padding: 6px 10px; text-align: left;
+  font-weight: 700; font-size: 9px; color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  position: sticky; top: 0; z-index: 1; border-bottom: 2px solid var(--border);
+}
+.pdf-tbl td { padding: 4px 10px; border-bottom: 1px solid var(--gray-100); color: var(--gray-800); vertical-align: middle; }
+.pdf-sec-row td {
+  background: linear-gradient(90deg, #f0f9f4, #f8fdf9);
+  font-weight: 700; color: var(--green); font-size: 10px;
+  padding: 6px 10px; border-top: 2px solid var(--green-dim); border-bottom: 1px solid var(--green-dim);
+}
+.pdf-tbl tbody tr:not(.pdf-sec-row):hover td { background: var(--gray-50); }
+
+/* ── PDF DOCUMENT VIEW (Slide 3) ── */
+.pdf-doc-wrap {
+  background: #c8c8c8;
+  padding: 14px 10px;
+  overflow: auto;
+  max-height: 370px;
+}
+.pdf-page {
+  background: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+  width: 820px;
+  margin: 0 auto;
+  border: 1px solid #bbb;
+  /* Hide the CSS-styled PDF when showing real PDF */
+  display: none;
+}
+.pdf-iframe {
+  background: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+  width: 820px;
+  height: 600px;
+  margin: 0 auto;
+  border: 1px solid #bbb;
+  display: block;
+}
+.pdf-page-hdr {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  font-size: 10px;
+  color: #444;
+}
+.pdf-page-hdr-left {
+  width: 120px;
+  border-right: 1px solid #ccc;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-page-hdr-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #111;
+  border-right: 1px solid #ccc;
+}
+.pdf-page-hdr-right {
+  width: 160px;
+  padding: 6px 10px;
+  font-size: 9.5px;
+  line-height: 1.8;
+  color: #444;
+}
+.pdf-gondola {
+  display: flex;
+  padding: 12px 8px 4px;
+  gap: 0;
+  border: 1px solid #888;
+  margin: 14px 10px 10px;
+  background: #f5f3ef;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+}
+.pdf-col {
+  flex: 1;
+  border-right: 2px solid #999;
+  padding: 0 4px 4px;
+}
+.pdf-col:last-child { border-right: none; }
+.pdf-col-hdr {
+  font-size: 7.5px;
+  font-weight: 700;
+  text-align: center;
+  color: #555;
+  padding: 2px 0 4px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px dashed #bbb;
+  margin-bottom: 3px;
+}
+.pdf-gondola-row {
+  display: flex;
+  gap: 1.5px;
+  margin-bottom: 3px;
+  align-items: flex-end;
+  border-bottom: 2px solid #888;
+  padding-bottom: 2px;
+}
+.pdf-gondola-prod {
+  flex: 1;
+  border-radius: 2px;
+  padding: 2px 1px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid;
+}
+.pdf-gondola-prod-name {
+  font-size: 6px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+  hyphens: auto;
+}
+.pdf-row-tick {
+  writing-mode: vertical-rl;
+  font-size: 6px;
+  color: #888;
+  padding-right: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pdf-page-ftr {
+  border-top: 1px solid #ccc;
+  margin: 4px 10px 0;
+  font-size: 9px;
+  color: #555;
+}
+.pdf-page-ftr-title {
+  text-align: center;
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.pdf-page-ftr-sigs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.pdf-page-ftr-sig {
+  flex: 1;
+  border-right: 1px solid #ccc;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 8.5px;
+  color: #333;
+}
+.pdf-page-ftr-sig:last-child { border-right: none; }
+.pdf-page-ftr-blank {
+  display: flex;
+}
+.pdf-page-ftr-box {
+  flex: 1;
+  height: 32px;
+  border-right: 1px solid #ccc;
+}
+.pdf-page-ftr-box:last-child { border-right: none; }
+.pdf-fm-logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #00843D;
+}
+.pdf-fm-logo-stripe { width: 3px; height: 16px; background: #00843D; border-radius: 1px; }
+
+/* ── ANALYSIS STREAM ── */
+.stream-box {
+  background: var(--gray-900);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  color: #86EFAC;
+  line-height: 1.7;
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.stream-box .dim { color: #6B7280; }
+.stream-box .highlight { color: #FCD34D; }
+.stream-box .err { color: #FCA5A5; }
+
+/* ── PROGRESS ── */
+.progress-track {
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--green);
+  transition: width 0.4s ease;
+}
+
+/* ── ANALYSIS STEPS ── */
+.a-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--gray-500);
+  border-bottom: 1px solid var(--gray-100);
+}
+.a-step:last-child { border-bottom: none; }
+.a-step.done { color: var(--gray-700); }
+.a-step.active { color: var(--green); font-weight: 500; }
+.a-step-icon { font-size: 14px; width: 20px; text-align: center; }
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-anim 1s ease-in-out infinite;
+}
+@keyframes pulse-anim { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+/* ── RESULT ── */
+.score-circle {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.score-circle .score-num { font-size: 28px; line-height: 1; }
+.score-circle .score-lbl { font-size: 10px; font-weight: 500; margin-top: 2px; }
+.issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.issue-item:last-child { border-bottom: none; }
+.issue-dot {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.metric-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.metric-num { font-size: 24px; font-weight: 700; margin-top: 2px; }
+.metric-lbl { font-size: 11px; color: var(--gray-500); }
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: var(--gray-900);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #D1D5DB;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* ── PLANOGRAM LIBRARY ── */
+.plan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.plan-card:hover { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,132,61,0.08); }
+.plan-card.selected { border-color: var(--green); background: var(--green-pale); box-shadow: 0 0 0 3px rgba(0,132,61,0.1); }
+.plan-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.plan-card-name { font-weight: 600; font-size: 13px; }
+.plan-card-meta { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.plan-check { display: none; }
+.plan-card.selected .plan-check { display: flex; }
+
+/* ── UPLOAD PAGE ── */
+.pdf-upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pdf-upload-zone:hover { border-color: var(--green); background: var(--green-pale); }
+.pdf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: all 0.15s;
+}
+.pdf-item:hover { border-color: var(--gray-400); }
+.pdf-icon { font-size: 22px; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── FLOW DIAGRAM ── */
+.flow { display: flex; align-items: center; gap: 0; margin: 16px 0; overflow-x: auto; padding: 8px 0; }
+.flow-node {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+.flow-arrow { color: var(--gray-400); font-size: 18px; padding: 0 4px; flex-shrink: 0; }
+.flow-node.green { background: var(--green-pale); border-color: var(--green-dim); color: var(--green); }
+.flow-node.blue { background: var(--blue-pale); border-color: #BFDBFE; color: var(--blue); }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 2px; background: var(--gray-100); border-radius: 10px; padding: 3px; margin-bottom: 16px; }
+.tab {
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-600);
+  transition: all 0.15s;
+  text-align: center;
+}
+.tab.active { background: white; color: var(--gray-900); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ── NOTIFICATION BANNER ── */
+.banner {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.banner-green { background: var(--green-pale); color: #14532D; border: 1px solid var(--green-dim); }
+.banner-amber { background: var(--amber-pale); color: #78350F; border: 1px solid #FDE68A; }
+.banner-red { background: var(--red-pale); color: #7F1D1D; border: 1px solid #FECACA; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .hero { padding: 24px 20px; }
+  .hero h1 { font-size: 22px; }
+  .hero-stats { gap: 20px; }
+  .hero-actions { flex-direction: column; }
+  .topbar { padding: 0 14px; }
+  .main { padding: 16px 12px; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+
+/* ── COMPLIANCE CANVAS ── */
+.photo-canvas-wrap {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #0f172a;
+  cursor: crosshair;
+}
+.photo-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+.slot-tooltip {
+  position: absolute;
+  display: none;
+  background: rgba(8,12,25,0.97);
+  color: white;
+  padding: 9px 13px;
+  border-radius: 9px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 20;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* ── COMP TABS ── */
+.comp-tabs { display: flex; gap: 2px; background: var(--gray-100); border-radius: 8px; padding: 3px; }
+.comp-tab {
+  padding: 5px 12px; border: none; border-radius: 5px; background: transparent;
+  cursor: pointer; font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 500;
+  color: var(--gray-600); transition: all 0.15s; white-space: nowrap;
+}
+.comp-tab.active { background: white; color: var(--gray-900); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ── SCORE BANNER ── */
+.score-ring {
+  width: 88px; height: 88px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: white; border: 4px solid; flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.score-ring .snum { font-size: 26px; font-weight: 800; line-height: 1; }
+.score-ring .slbl { font-size: 9px; font-weight: 600; opacity: 0.75; margin-top: 1px; }
+.stat-box {
+  background: white; border-radius: 9px; padding: 10px 14px;
+  text-align: center; border: 1.5px solid; min-width: 68px;
+}
+.stat-box .sbn { font-size: 22px; font-weight: 800; }
+.stat-box .sbl { font-size: 10px; font-weight: 500; margin-top: 1px; }
+
+/* ── COMPLIANCE BAR ── */
+.comp-bar-track {
+  height: 10px; background: rgba(0,0,0,0.08); border-radius: 5px; overflow: hidden; max-width: 320px;
+}
+.comp-bar-fill {
+  height: 100%; border-radius: 5px; width: 0%;
+  transition: width 1.1s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── MISSING PULSE ── */
+@keyframes missing-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<nav class="topbar">
+  <div class="topbar-logo">
+    <img src="/static/FamilyMart-Logo.png" alt="FamilyMart"
+         style="height:30px;width:auto;object-fit:contain;display:block;"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+    <span class="fm-badge" style="display:none;">FamilyMart</span>
+    <span style="width:1px;height:18px;background:var(--gray-300);margin:0 2px;display:inline-block;"></span>
+    <span>Planogram AI Engine</span>
+    <span style="font-size:11px; color:var(--gray-500); font-weight:400;">Indonesia</span>
+  </div>
+  <div class="topbar-nav">
+    <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showPage('check')">Check Shelf</button>
+    <button class="nav-btn" onclick="showPage('library')">Planograms</button>
+    <button class="nav-btn primary" onclick="showPage('upload')">+ Upload PDF</button>
+    <button class="nav-btn" onclick="showPage('testing')" style="border-color:var(--amber);color:var(--amber);">⚗ Testing</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="hero">
+      <div style="display:flex;align-items:center;gap:28px;">
+
+        <!-- Left: text content -->
+        <div style="flex:1;min-width:0;">
+          <div class="hero-tag">🤖 AI-powered compliance checking</div>
+          <h1>Planogram Compliance,<br>automated.</h1>
+          <p>Upload a shelf photo, pick your planogram zone, and the AI instantly tells you what's correct, missing, misplaced, or unexpected — no manual checking needed.</p>
+          <div class="hero-stats">
+            <div class="hero-stat"><span class="num">2</span><span class="lbl">Planograms loaded</span></div>
+            <div class="hero-stat"><span class="num">158</span><span class="lbl">Product slots mapped</span></div>
+            <div class="hero-stat"><span class="num">Gemini Pro 2.5</span><span class="lbl">Vision model</span></div>
+          </div>
+          <div class="hero-actions">
+            <button class="hero-btn white" onclick="showPage('check')">▶ Start Shelf Check</button>
+            <button class="hero-btn outline" onclick="showPage('library')">View Planogram Library</button>
+          </div>
+        </div>
+
+        <!-- Right: store photo — contained rounded box -->
+        <div style="flex-shrink:0;width:450px;height:382px;border-radius:10px;overflow:hidden;
+                    border:2px solid rgba(255,255,255,0.18);
+                    box-shadow:0 8px 32px rgba(0,0,0,0.35);
+                    position:relative;">
+          <img
+            id="heroStoreImg"
+            src="/static/Store.png"
+            alt="FamilyMart store"
+            style="width:100%;height:100%;object-fit:cover;display:block;"
+            onerror="this.style.display='none';document.getElementById('heroPlaceholder').style.display='flex';">
+          <!-- Placeholder shown when image fails -->
+          <div id="heroPlaceholder" style="
+              display:none;position:absolute;inset:0;
+              flex-direction:column;align-items:center;justify-content:center;
+              gap:10px;color:rgba(255,255,255,0.55);text-align:center;padding:24px;
+              background:rgba(255,255,255,0.07);">
+            <div style="font-size:46px;opacity:0.45;">🏪</div>
+            <div style="font-size:12px;font-weight:600;opacity:0.85;">Store photo</div>
+            <div style="font-size:10px;opacity:0.5;line-height:1.8;">
+              Name your image <code style="background:rgba(255,255,255,0.12);padding:1px 5px;border-radius:3px;font-size:10px;">Store.png</code><br>and place it in the project root
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:20px;">
+      <div class="card card-sm">
+        <div class="section-label">How it works</div>
+        <div class="flow" style="flex-direction:column; align-items:flex-start; gap:0;">
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Supervisor takes shelf photo</div>
+              <div style="font-size:11px;color:var(--gray-500);">Via FamilyLink app in-store</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Selects planogram zone</div>
+              <div style="font-size:11px;color:var(--gray-500);">From uploaded PDF library</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Claude Vision analyzes</div>
+              <div style="font-size:11px;color:var(--gray-500);">Reads product labels from photo</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:12px;background:var(--border);margin-left:14px;"></div>
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green-pale);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:1.5px solid var(--green);">4</div>
+            <div>
+              <div style="font-size:12px;font-weight:500;">Returns compliance result</div>
+              <div style="font-size:11px;color:var(--gray-500);">JSON score + issue breakdown</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="section-label">Why not YOLOv8?</div>
+        <div style="font-size:12px; line-height:1.8; color:var(--gray-700);">
+          <div style="margin-bottom:8px;">✅ <strong>No training data needed</strong> — Claude Vision reads text on packaging directly. No labeling 100-200 photos.</div>
+          <div style="margin-bottom:8px;">✅ <strong>Works immediately</strong> — drop in a new planogram PDF and it works. YOLO requires retraining.</div>
+          <div style="margin-bottom:8px;">✅ <strong>Supervisor photos are focused</strong> — one shelf section per shot, no crowd detection needed.</div>
+          <div>⚠️ <strong>YOLOv8 is Phase 2</strong> — for wide-angle store scans in the future.</div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="section-label">API endpoint</div>
+        <div class="code-block">POST /check
+Content-Type: application/json
+
+{
+  "planogram_id": "SNACK3C-COL1",
+  "store_id": "FM-CIBUBUR-001",
+  "image": "[base64 JPG]"
+}
+
+→ Response:
+{
+  "status": "fail",
+  "compliance_score": 83,
+  "issues": [...],
+  "correct": [...],
+  "summary": "..."
+}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="section-label" style="margin-bottom:14px;">Loaded planograms</div>
+      <div class="grid-3">
+        <div class="plan-card" onclick="showPage('check')">
+          <div class="plan-card-header">
+            <div>
+              <div class="plan-card-name">SNACK3C</div>
+              <div class="plan-card-meta">Snack section — 3 columns</div>
+            </div>
+            <span class="badge badge-green">Active</span>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:8px;">
+            <span class="tag tag-gray">101 products</span>
+            <span class="tag tag-blue">6 rows/col</span>
+            <span class="tag tag-gray">1 Apr 2026</span>
+          </div>
+        </div>
+        <div class="plan-card" onclick="showPage('check')">
+          <div class="plan-card-header">
+            <div>
+              <div class="plan-card-name">BISCUIT5H</div>
+              <div class="plan-card-meta">Biscuit section — 5 columns</div>
+            </div>
+            <span class="badge badge-green">Active</span>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:8px;">
+            <span class="tag tag-gray">159 products</span>
+            <span class="tag tag-blue">8 rows/col</span>
+            <span class="tag tag-gray">17 Mar 2026</span>
+          </div>
+        </div>
+        <div class="plan-card" onclick="showPage('upload')" style="border-style:dashed; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; min-height:90px; color:var(--gray-400);">
+          <div style="font-size:24px;">+</div>
+          <div style="font-size:12px; font-weight:500;">Upload new planogram PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHECK SHELF ══ -->
+  <div class="page" id="page-check">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:18px; font-weight:600;">Shelf Compliance Check</h2>
+        <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">Upload a shelf photo and select the planogram zone to analyze</p>
+      </div>
+    </div>
+
+    <div class="wizard" id="checkWizard">
+      <div class="wizard-step active" id="ws1"><div class="wdot active" id="wd1">1</div><div class="wlabel active" id="wl1">Select zone</div></div>
+      <div class="wizard-step" id="ws2"><div class="wdot idle" id="wd2">2</div><div class="wlabel" id="wl2">Upload photo</div></div>
+      <div class="wizard-step" id="ws3"><div class="wdot idle" id="wd3">3</div><div class="wlabel" id="wl3">AI analysis</div></div>
+      <div class="wizard-step" id="ws4"><div class="wdot idle" id="wd4">4</div><div class="wlabel" id="wl4">Result</div></div>
+    </div>
+
+    <!-- Step 1: Select planogram -->
+    <div id="cs1" class="fade-in">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">Store & Planogram</div>
+          <div class="form-group">
+            <label class="form-label">Store ID</label>
+            <select class="form-select" id="storeSelect">
+              <option>FM-CIBUBUR-001</option>
+              <option>FM-KELAPA-GADING-012</option>
+              <option>FM-SUDIRMAN-007</option>
+              <option>FM-BEKASI-TIMUR-021</option>
+              <option>FM-TANGERANG-SELATAN-033</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Planogram</label>
+            <select class="form-select" id="planogramSelect" onchange="onPlanogramSelected()">
+              <option value="">-- Select a planogram --</option>
+            </select>
+          </div>
+          <div id="planogramMeta" style="display:none; margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;"></div>
+        </div>
+        <div class="card">
+          <div class="section-label" style="margin-bottom:10px;">Gondola Structure — <span id="gondolaLabel" class="mono" style="color:var(--green);">—</span></div>
+          <div id="gondolaPreview" style="min-height:140px; display:flex; align-items:center; justify-content:center; color:var(--gray-400); font-size:13px;">
+            Select a planogram to preview its gondola structure
+          </div>
+          <div style="margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;" id="gondolaMeta"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="continueBtn" onclick="goCheckStep(2)" disabled>Continue → Upload photos</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Upload section photos -->
+    <div id="cs2" style="display:none;">
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div class="section-label" style="margin-bottom:0;">Upload Section Photos</div>
+            <div style="font-size:11px; color:var(--gray-500); margin-top:2px;">
+              Photograph each section straight-on — one photo per slot, each covers 2 shelf rows
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span id="uploadCount" class="badge" style="background:var(--gray-100);color:var(--gray-600);">0 / 0 uploaded</span>
+            <span id="planogramBadge" class="badge badge-green"></span>
+          </div>
+        </div>
+        <div id="photoGrid"></div>
+        <hr class="divider">
+        <div style="font-size:12px; color:var(--gray-600); line-height:1.9;">
+          ✅ Photograph each section straight-on (not angled)<br>
+          ✅ Each photo captures 2 shelf rows (e.g. rows 1.1 &amp; 1.2)<br>
+          ✅ Work left-to-right, top-to-bottom<br>
+          ✅ Fill the entire frame with that section only<br>
+          ✅ Avoid glare, blur, or customers in frame
+        </div>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:8px;">
+        <button class="btn" onclick="goCheckStep(1)">← Back</button>
+        <button class="btn btn-primary" id="analyzeBtn" onclick="goCheckStep(3)" disabled>Analyze Full Gondola →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="cs3" style="display:none;">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;" id="aiAvatar">🤖</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">claude-sonnet-4 · Vision + Text</div>
+            <div style="font-size:12px;color:var(--gray-500);" id="aiStatusText">Initializing…</div>
+          </div>
+          <span class="badge" id="aiBadge" style="background:var(--blue-pale);color:var(--blue);">
+            <span class="pulse-dot" style="margin-right:5px;"></span>Processing
+          </span>
+        </div>
+        <div id="analysisSteps"></div>
+        <div style="margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray-500);">
+            <span>Analysis progress</span><span id="pctLabel">0%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Claude reasoning</div>
+        <div class="stream-box" id="streamBox"></div>
+      </div>
+    </div>
+
+    <!-- Step 4 (Result) -->
+    <div id="cs4" style="display:none;">
+      <div id="resultContent"></div>
+      <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn" onclick="resetCheck()">← New check</button>
+        <button class="btn btn-primary" onclick="showPage('library')">View all planograms</button>
+        <button class="btn" onclick="showPage('upload')">Upload new PDF</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PLANOGRAM LIBRARY ══ -->
+  <div class="page" id="page-library">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:18px; font-weight:600;">Planogram Library</h2>
+        <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">All uploaded planogram PDFs and their shelf zones</p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('upload')">+ Upload PDF</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchLibTab('snack')">SNACK3C (snack section)</button>
+      <button class="tab" onclick="switchLibTab('biscuit')">BISCUIT5H (biscuit section)</button>
+    </div>
+
+    <div id="libSnack">
+      <div class="banner banner-green">📄 SNACK3C.pdf · Date 01 April 2026 · 101 products across 3 columns</div>
+      <div id="libSnackContent"></div>
+    </div>
+    <div id="libBiscuit" style="display:none;">
+      <div class="banner banner-green">📄 BISCUIT5H.pdf · Date 17 Maret 2026 · 159 products across 5 columns</div>
+      <div id="libBiscuitContent"></div>
+    </div>
+  </div>
+
+  <!-- ══ TESTING ══ -->
+  <div class="page" id="page-testing">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h2 style="font-size:18px; font-weight:600;" id="tstPageTitle">SNACK5C — Column 1 Testing</h2>
+        <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">Upload 3 photos — each covers 2 shelf rows. Gemini detects products per row, then compares position-by-position against the planogram.</p>
+      </div>
+      <span class="badge" style="background:var(--amber-pale);color:var(--amber);font-size:11px;">⚗ Dev / Testing mode · SNACK5C locked</span>
+    </div>
+
+    <!-- Column selector tabs -->
+    <div class="card" style="margin-bottom:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;font-weight:600;color:var(--gray-600);">Test Column:</span>
+      <button class="nav-btn active" id="tstColBtn1" onclick="tstSwitchColumn('1')">Column 1</button>
+      <button class="nav-btn" id="tstColBtn4" onclick="tstSwitchColumn('4')">Column 4</button>
+      <span style="font-size:11px;color:var(--gray-400);margin-left:4px;">— selects which gondola column to test against the planogram</span>
+    </div>
+
+    <!-- Store select -->
+    <div class="card" style="margin-bottom:14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+      <div style="font-size:13px; font-weight:500; min-width:70px;">Store ID</div>
+      <select class="form-select" id="tstStoreSelect" style="max-width:280px;">
+        <option>FM-CIBUBUR-001</option>
+        <option>FM-KELAPA-GADING-012</option>
+        <option>FM-SUDIRMAN-007</option>
+        <option>FM-BEKASI-TIMUR-021</option>
+        <option>FM-TANGERANG-SELATAN-033</option>
+      </select>
+      <span class="tag tag-gray" style="font-family:var(--mono,monospace);" id="tstColumnTag">SNACK5C · column 1 · rows 1.1 – 1.6</span>
+    </div>
+
+    <!-- Photo upload cards — built dynamically by _tstBuildGrid() -->
+    <div id="tstPhotoGrid" style="margin-bottom:14px;"></div>
+
+    <!-- Action bar -->
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+      <button class="btn btn-primary" id="tstRunBtn" onclick="runTesting()" disabled>Run SNACK5C Test</button>
+      <button class="btn" onclick="tstReset()">Reset</button>
+      <span id="tstUploadedCount" style="font-size:12px; color:var(--gray-500);">0 / 3 photos uploaded</span>
+    </div>
+
+    <!-- Progress card (hidden until running) -->
+    <div class="card" id="tstProgress" style="display:none; margin-bottom:14px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <div style="font-size:20px;">🤖</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:600;" id="tstProgressTitle">Gemini Vision · SNACK5C Column 1 Testing</div>
+          <div style="font-size:12px; color:var(--gray-500);" id="tstStatusText">Initializing…</div>
+        </div>
+        <span class="badge" id="tstBadgeStatus" style="background:var(--blue-pale);color:var(--blue);">
+          <span class="pulse-dot" style="margin-right:5px;"></span>Running
+        </span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gray-500); margin-bottom:4px;">
+        <span>Progress</span><span id="tstPctLabel">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="tstProgressBar" style="width:0%;"></div></div>
+      <div class="stream-box" id="tstLog" style="margin-top:10px; max-height:140px;"></div>
+    </div>
+
+    <!-- Results (hidden until done) -->
+    <div id="tstResults" style="display:none;"></div>
+
+  </div><!-- /page-testing -->
+
+  <!-- ══ UPLOAD PDF ══ -->
+  <div class="page" id="page-upload">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px; font-weight:600;">Upload Planogram PDF</h2>
+      <p style="font-size:13px; color:var(--gray-500); margin-top:2px;">Add new planogram PDFs from the Spaceman system. They become immediately available for shelf checking.</p>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="section-label">Upload new PDF</div>
+          <div class="pdf-upload-zone" onclick="document.getElementById('pdfInput').click()" id="pdfDropZone">
+            <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfUpload(event)">
+            <div style="font-size:36px; margin-bottom:10px;">📄</div>
+            <div style="font-size:14px; font-weight:500; margin-bottom:4px;">Click to upload planogram PDF</div>
+            <div style="font-size:12px; color:var(--gray-500);">Exported from Spaceman software · PDF format</div>
+          </div>
+          <div id="uploadStatus" style="display:none; margin-top:12px;"></div>
+          <div id="uploadForm" style="display:none; margin-top:14px;">
+            <div class="form-group">
+              <label class="form-label">Zone label (e.g. SNACK3C, BISCUIT5H)</label>
+              <input class="form-input" id="pdfLabel" placeholder="e.g. DAIRY1A">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="pdfCategory">
+                <option>Snack</option>
+                <option>Biscuit</option>
+                <option>Beverage</option>
+                <option>Dairy</option>
+                <option>Confectionery</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="confirmPdfUpload()">✓ Add to library</button>
+          </div>
+        </div>
+
+        <div class="card card-sm">
+          <div class="section-label">What happens after upload</div>
+          <div style="font-size:12px; color:var(--gray-600); line-height:2.0;">
+            <div>1. PDF is stored in <code>/planograms/</code> folder</div>
+            <div>2. PyMuPDF extracts the shelf image page</div>
+            <div>3. Product positions parsed from PDF text layer</div>
+            <div>4. Zone becomes available in shelf check selector</div>
+            <div>5. Supervisors are notified via FamilyLink</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Current planogram files</div>
+        <div id="pdfList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════
+//  SUPABASE CONFIG
+//  Fill in your project URL + anon key when ready.
+//  PDFs must be in a public bucket named "planograms".
+// ═══════════════════════════════════
+const SUPABASE_URL      = 'https://qoqejmpekjfyozkbdpxs.supabase.co';       // e.g. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvcWVqbXBla2pmeW96a2JkcHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MTI4OTksImV4cCI6MjA5MTI4ODg5OX0.7aIRL45TGtBEmFovP6udou4G_GQ1Tppq9b_yX8fMkvg';  // anon/public key from project settings
+
+function supabaseConfigured() {
+  return !SUPABASE_URL.startsWith('YOUR_') && !SUPABASE_ANON_KEY.startsWith('YOUR_');
+}
+
+/**
+ * Returns the public URL for a planogram PDF stored in Supabase Storage.
+ * Bucket: planograms   Path: {filename}  (e.g. "SNACK3C.pdf")
+ */
+function getPlanogramPdfUrl(filename) {
+  const id = filename.replace('.pdf', '');
+  // Always try the backend first (null = unknown, true = confirmed online, both ok to try)
+  // The iframe will silently show nothing if it fails, and onerror can't fire on iframes,
+  // so we show a reload button via buildPdfPageHTML instead.
+  if (_backendOnline !== false) {
+    return `${API_BASE_URL}/planograms/${encodeURIComponent(id)}/pdf`;
+  }
+  // Backend confirmed offline → Supabase public storage
+  if (supabaseConfigured()) {
+    return `${SUPABASE_URL}/storage/v1/object/public/PlanogramPDF/${encodeURIComponent(filename)}`;
+  }
+  return `/PlanogramPDF/${filename}`;
+}
+
+// ═══════════════════════════════════
+//  BACKEND API CONFIG (FastAPI server)
+//  Start the server:
+//    cd "planogram-ai Gemini"
+//    source venv/bin/activate
+//    uvicorn main:app --reload --port 8000
+// ═══════════════════════════════════
+const API_BASE_URL = '';
+let _backendOnline = null;   // cached after first check
+let _lastApiResult = null;   // raw backend response
+let _lastUploadedPdf = null; // File ref for PDF upload
+
+async function isBackendOnline() {
+  try {
+    const r = await fetch(API_BASE_URL + '/health', { signal: AbortSignal.timeout(3000) });
+    _backendOnline = r.ok;
+  } catch { _backendOnline = false; }
+  return _backendOnline;
+}
+
+function showBackendBadge(online) {
+  const nav = document.querySelector('.topbar-nav');
+  const old = document.getElementById('backendBadge');
+  if (old) old.remove();
+  const b = document.createElement('span');
+  b.id = 'backendBadge';
+  b.style.cssText = 'font-size:10px;padding:4px 10px;border-radius:20px;font-weight:600;margin-left:4px;';
+  if (online) {
+    b.style.background = 'var(--green-pale)'; b.style.color = 'var(--green)';
+    b.textContent = '● API online';
+  } else {
+    b.style.background = 'var(--amber-pale)'; b.style.color = 'var(--amber)';
+    b.textContent = '○ Demo mode';
+    b.title = 'Backend not reachable at ' + API_BASE_URL;
+  }
+  nav.appendChild(b);
+}
+
+// ═══════════════════════════════════
+//   PLANOGRAM DATA (real from PDFs)
+// ═══════════════════════════════════
+const PLANS = {
+  snack_1: {
+    id:"SNACK3C-COL1", label:"SNACK3C — Column 1", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 1.1", h:"140cm", slots:["Pringles Original 102g","PotatoQ Rumput Laut 50g","PotatoQ Sosis Meksiko 50g","Chitato Lite Sour Cream 68g","Chitato Lite Nori 65g","Chitato Lite Aburi 65g","Chitato Sapi Panggang 168g"]},
+      {id:"SNACK 1.2", h:"120cm", slots:["Lays Seaweed 64g","Chitato Lite Ayam Bawang 65g","Chitato Mi Goreng 65g","Chitato Original 68g","Chitato Ayam Bumbu 65g","Chitato Sapi BBQ 65g"]},
+      {id:"SNACK 1.3", h:"100cm", slots:["Qtela Tempe Cabe Rawit 55g","Qtela Tempe Rumput Laut 55g","Roni Makaroni RoastCorn 135g","Roni Makaroni Ex Spicy 135g","Boncabe Kulit Pangsit 70g","Boncabe Makaroni Krispi 135g"]},
+      {id:"SNACK 1.4", h:"80cm", slots:["Taro Tempe Chicken Onion 50g","Taro Tempe Himalayan Salt 50g","Kusuka Ubimix Honey 40g","Kusuka Singkong BBQ 60g","Kusuka Singkong Ayam Lada 60g","Kusuka Singkong Super Pedas 50g"]},
+      {id:"SNACK 1.5", h:"60cm", slots:["Chuba Keripik Singkong Keju 125g","Chuba Cassava Sambal Balado 125g","Qtela Balado 175g","Kusuka Singkong Original 180g","Kusuka Singkong Barbeque 180g"]},
+      {id:"SNACK 1.6", h:"20cm", slots:["Maxicorn Nacho Cheese 140g","Maxicorn Roasted Corn 140g","Happytos Hijau Tortilla 140g","Happytos Merah Corn 140g","Tos Tos Korean BBQ 140g","Tos Tos Nacho Cheese 140g"]},
+    ]
+  },
+  snack_2: {
+    id:"SNACK3C-COL2", label:"SNACK3C — Column 2", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 2.1", h:"140cm", slots:["Potabee BBQ 65g","Potabee Wagyu Beef 65g","Potabee Seaweed 65g","Japota Umami Seaweed 68g","GuriBee Rumput Laut 65g"]},
+      {id:"SNACK 2.2", h:"120cm", slots:["GuriBee BBQ Balado 65g","Potabee Salted Egg 68g","Potabee Ayam Bakar 68g","Japota Nipis Pedas 68g","Japota Honey Butter 68g","Japota Original 68g"]},
+      {id:"SNACK 1.7", h:"100cm", slots:["Guribee Layers Keju Krispi 65g","Piattos Big & Crispy 68g","Piattos Sapi Panggang 65g","Siantar Top French Fries 62g","Siantar Top French Fries 130g"]},
+      {id:"SNACK 2.3", h:"80cm", slots:["Chiki Twist Roasted Corn 75g","Chiki Twist Flaming Hot 75g","Chiki Twist Keju Duo 70g","Chiki Twist Jagung Bakar 65g","Twistko Snack Jagung Bakar 70g","Siantar Top French Fries Lv3 60g"]},
+      {id:"SNACK 2.4", h:"60cm", slots:["Chiki Puffs Cheddar Cheese 60g","Oishi Rin Bee Keju 60g","Oishi Rasa Udang Pedas 60g","Taro Net Seaweed 62g","Jetz Choco Fiesta 65g","Smax Ring Rasa Keju 40g"]},
+      {id:"SNACK 2.5", h:"20cm", slots:["Mr.Hottest Maitos Sambal Balado 140g","Chiki Balls Cheese 55g","Chiki Balls Kaldu Ayam 50g","Chiki Balls Coklat 50g","Momogi Star Bite Chocolate 50g","Momogi Mini Stick Roasted Corn 50g"]},
+    ]
+  },
+  snack_3: {
+    id:"SNACK3C-COL3", label:"SNACK3C — Column 3", file:"SNACK3C.pdf", category:"Snack",
+    rows:[
+      {id:"SNACK 3.1", h:"140cm", slots:["Gemez Mie Enaak 22g","Spix Soba Mie Chicken 21g","Spix Mie Goreng 50g","Mie Kremezz Mie Goreng 30g","Lidi Geli Spicy 50g","Dua Kelinci Mix Nuts 60g"]},
+      {id:"SNACK 3.2", h:"120cm", slots:["Mayasi Kacang Jepang Pedas 65g","Mayasi Koro Pedas 65g","Mayasi Kacang Jepang Garlic 65g","Tic Tac Mi Goreng 80g","Tic Tac Mix 80g"]},
+      {id:"SNACK 3.3", h:"100cm", slots:["Garuda Pilus Mie Goreng 80g","Garuda Pilus Pedas 80g","Garuda Pilus Sapi Panggang 80g","Tic Tac Sapi Panggang 80g"]},
+      {id:"SNACK 3.4", h:"80cm", slots:["Garuda Rosta Kac Panggang Pedas 95g","Garuda Rosta Kac Panggang Bawang 100g","Dua Kelinci Sukro Oven Bawang 95g","Garuda Kacang Atom Original 100g","Dua Kelinci Sukro 95g"]},
+      {id:"SNACK 3.5", h:"60cm", slots:["Garuda Kacang Kulit 160g","Dua Kelinci Kuaci Fuzo Original 140g","Rebo Kuaci Original 120g","Mamasuka Rumput Laut 2X4.5g","Mamasuka Rumput Laut Pedas 2X4.5g"]},
+      {id:"SNACK 3.6", h:"20cm", slots:["Wonhae Topokki Snack Creamy Rose 80g","Cem Cem Corn Shot Ayam Goreng 55g","Cem Cem Corn Shot Cokelat 55g","Cem Cem Pop Corn Chocolate 55g","Oishi Pillows Coklat 100g","Oishi Sponge Crunch Coklat 100g"]},
+    ]
+  },
+  biscuit_1: {
+    id:"BISCUIT5H-COL1", label:"BISCUIT5H — Column 1", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 1.1", h:"140cm", slots:["Oreo Chocolate 105g","Oreo Vanilla 105g","Oreo Dark & White Choco 105g","Oreo Mini Vanilla Pck 58g"]},
+      {id:"BISCUIT 1.2", h:"120cm", slots:["Regal Marie Duo Chocolate 100g","Regal Marie Duo Peanut Butter 100g","Serena Togo Long Choc Sandwich 128g","Serena Togo Long Rasa Kacang 128g"]},
+      {id:"BISCUIT 1.3", h:"100cm", slots:["Kokola Kukis Black 110g","Ovaltine Choc Malt Cookies 104g","Milo Biscuit Activ Original 104g","Milo Biscuit Activ Milk 104g"]},
+      {id:"BISCUIT 1.4", h:"80cm", slots:["Roma Sari Gandum Coklat 108g","Roma Sari Gandum Peanut Butter 108g","Julies Choco More Sandwich 99g","Julies Peanut Butter Sandwich 82g"]},
+      {id:"BISCUIT 1.5", h:"60cm", slots:["Biskies Choco Crm 96g","Biskies Cheese Crm 96g","Franzzi Dark Choco Cookies 70g","Franzzi Cheese Choco Cookies 70g"]},
+      {id:"BISCUIT 1.6", h:"40cm", slots:["Roma Slai Olai Strawberry 128g","Roma Slai Olai Blueberry 128g","Imperial Creame Rasberry 108g","Imperial Creame Bluberry 108g"]},
+      {id:"BISCUIT 1.7", h:"20cm", slots:["Unibis Bon Bon Chocolate 200g","Ritz Cheese 91g","Biskies Oat Gandum Kurma 108g","Better Sandwich Biscuit Vanila 100g"]},
+      {id:"BISCUIT 1.8", h:"0cm", slots:["Khong Guan Superco Coklat 138g","Monde Bourbon Chocolate 140g","Unibis Chocolate Short Cake 205g","Roma Sandwichi Chocolate 189g"]},
+    ]
+  },
+  biscuit_2: {
+    id:"BISCUIT5H-COL2", label:"BISCUIT5H — Column 2", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 2.1", h:"140cm", slots:["Good Time Mini Double Choc 50g","WRP Keju Edam Cheese Cookies 30g","Choco Mania ChocoChips&Cheese 69g","Roma Slai Olai Triple Fun 80g","Better FunBites Pouch 100g","Monde Pie Bis 190g"]},
+      {id:"BISCUIT 2.2", h:"120cm", slots:["Good Time Classic Chocochips 72g","Good Time Double Choc Chochips 72g","Good Time Rainbow Chocochips 72g","Good Time Choco Dip 71g","Good Time Coffee 72g"]},
+      {id:"BISCUIT 2.3", h:"100cm", slots:["Nabati Nextar Chocolate Pie 72g","Nabati Nextar Cheesecake Pie 72g","WRP Chocolate Chip Cookies 30g","WoCA Krunz Thin Cookies Espresso 90g","WoCA Krunz Thin Cookies Dark Choco 90g","WoCA Krunz Cookies and Cream 90g","Monde Shortbread Biscuit Mentega 115g"]},
+      {id:"BISCUIT 2.4", h:"80cm", slots:["Monde Genji Raisin Pie 85g","Monde Genji Original Pie 70g","Lotte Choco Pie Marshmallow Box 156g","Lotte Choco Pie Strawberry 156g"]},
+      {id:"BISCUIT 2.5", h:"60cm", slots:["ATB Marie Susu 180g","Regal Marie Biscuit 120g","Regal Marie Biscuit 230g","Regal Marie Biscuit Spc 230g","Nissin Lemonia 130g"]},
+      {id:"BISCUIT 2.6", h:"40cm", slots:["Roma Marie Susu New Gen 115g","MyBizcuit Gandum 135g","MyBizcuit Gandum Kismis 135g","MyBizcuit Gandum Cokelat 135g","Oatbits Raisin 110g"]},
+      {id:"BISCUIT 2.7", h:"20cm", slots:["Roma Marie Gold 10Sx20g","Roma Marie Gold Choco 132g","Roma Sari Gandum 240g","Roma Sari Gandum Biscuit 149g"]},
+      {id:"BISCUIT 2.8", h:"0cm", slots:["Roma Kelapa Biscuit 300g","Nissin Biskuit Kelapa Ijo 280g","Delux Cookies Cream Chocolate 160g","Roma Kelapa Cream Cokelat 178g"]},
+    ]
+  },
+  biscuit_3: {
+    id:"BISCUIT5H-COL3", label:"BISCUIT5H — Column 3 (Wafer)", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 3.1", h:"140cm", slots:["Delfi Twister Minis Black Vanilla 70g","Deka Wafer Mini Bites Choco 72g","Tango Wafer Chocolate Pouch 99g","Nabati Richoco Pch 100g","Tango Wafer Vanilla Pouch 99g","Nabati Richeese Pch 100g"]},
+      {id:"BISCUIT 3.2", h:"120cm", slots:["Astor Wafer Stick Double Choco 150g","Astor Double Choco 40g","Astor Wafer Stick Vanilla 40g","Astor Wafer Stick Matcha 40g","Jims Stick Wafer Chocolate 40g","Jims Stick Wafer Cappuccino 40g","Jims Stick Black Vanilla 40g","Chocolatos Rich WfrStick 54g"]},
+      {id:"BISCUIT 3.3", h:"100cm", slots:["Selamat Wafer Chocolate Pck 128g","Selamat Wafer Double Choco Box 128g","Superstar Triple Chocolate 6X16g"]},
+      {id:"BISCUIT 3.4", h:"80cm", slots:["Tango Wafer Cokelat 100g","Nissin Wafers Chocolate 110g","Roma Wafello Choco Blast 117g","Nabati Wafer Richoco 110g"]},
+      {id:"BISCUIT 3.5", h:"60cm", slots:["Tango Wafer Vanila 100g","Tango Sassy Strawberry 100g","Roma Wafello Butter Caramel 114g","Nabati Wafer Richese 110g"]},
+      {id:"BISCUIT 3.6", h:"40cm", slots:["Diasweet Wafer Vanilla 18g","Loacker Napolitaner 45g","Loacker Creamkakao 45g","My Motto Tiramisu 34g","My Motto Cocoa 34g","My Motto Hazelnut 34g","Tango Walut Belgian Choco 75g"]},
+      {id:"BISCUIT 3.7", h:"20cm", slots:["Biskies Black Milky Vanilla 72g","Mayasi Crepes Coklat 75g","Mayasi Crepes Strawberry 75g","Mayasi Crepes Choco Banana 75g","Tango Waffle Choco Hazelnut 75g"]},
+      {id:"BISCUIT 3.8", h:"0cm", slots:["Biskies Black Choco Creme 72g","Hatari Peanut Jam Biscuit 225g","Kokola Kukis Butter 218g","Monde Butter Cookies 150g","Khong Guan Assorted Biscuit 300g"]},
+    ]
+  },
+  biscuit_5: {
+    id:"BISCUIT5H-COL5", label:"BISCUIT5H — Column 5 (Pocky/Snacks)", file:"BISCUIT5H.pdf", category:"Biscuit",
+    rows:[
+      {id:"BISCUIT 5.1", h:"140cm", slots:["Lemonilo Brownies Crispy Choco 35g","Lemonilo Brownies Crispy Chese 35g","Lemonilo Brownies Cheese Strawberry 35g","Airas Brownies Crispy Coklat 30g","Tango Brownies Crispy 35g"]},
+      {id:"BISCUIT 5.2", h:"120cm", slots:["Ranjani MRC Macaron Cookies 50g","Ranjani MRC Macaron Cookies 100g","Monde Egg Drops 110g","Pocky Chocolate Share Pack 154g","Pocky Strawberry Share Pack 154g"]},
+      {id:"BISCUIT 5.3", h:"100cm", slots:["Pocky Chocolate 47g","Pocky Strawberry 45g","Pocky Crushed Blueberry Peach 38g","Pocky Crushed Strawberry Peach 38g","Pocky Crushed Nuts Milk Almond 25g","Pocky Milk Flavor 39g","Pocky Milk Chocolate 39g"]},
+      {id:"BISCUIT 5.4", h:"80cm", slots:["Pocky Cookies & Cream 40g","Pocky Double Choco 47g","Pocky Crushed Nuts Dark Almond 25g","Lotte Almond Pepero 32g","Lotte Pepero White Cookie 32g","Apetito Biscuit Stick BBQ 41g","Apetito Biscuit Stick Sour Cream 41g","Apetito Biscuit Stick Pizza 41g"]},
+      {id:"BISCUIT 5.5", h:"60cm", slots:["Hello Panda Coklat 42g","Hello Panda Double Choco 42g","Hello Panda Strawberry 42g","Hello Panda Caramel 42g","Nyam-Nyam Pop Stix 48g","Nyam Nyam Smiley Cokelat 45g","Choki Choki Stix Biscuit","Glico Pejoy Belgian Chocolate 30g"]},
+      {id:"BISCUIT 5.6", h:"40cm", slots:["Bess Diip Mini Snack Strawberry 96g","Nyam Nyam Bubble Puff Chocolate 18g","Nyam Nyam Fantasy Stick Coklat 25g","Barbie Jumbo Choco Snack 45g","Bess Diip Jumbo Snack Strawberry 45g","Chocolito Rich Choco 38g"]},
+      {id:"BISCUIT 5.7", h:"0cm", slots:["Bess Diip Mini Choco Snack 96g","Pororo Choco Stick Cookie & Choco 54g","Pororo Cone Little Penguin Choco 54g","Pororo Cone Little Penguin Strawberry 54g"]},
+    ]
+  }
+};
+
+// Simulated compliance results (realistic issues per zone)
+const RESULTS = {
+  snack_1: { score:83, missing:1, misplaced:2, unexpected:1, correct:29,
+    missingAt:[{r:0,s:3}], misplacedAt:[{r:1,s:2},{r:3,s:4}], unexpectedAt:[{r:2,s:4}],
+    unexpectedName:"Chitato Mi Goreng 65g (duplicate)",
+    issues:[
+      {type:"missing", prod:"Chitato Lite Sour Cream 68g", detail:"Expected SNACK 1.1 Slot 4 — product not on shelf"},
+      {type:"misplaced", prod:"Chitato Mi Goreng 65g", detail:"Found at SNACK 1.2 Slot 3 — should be Slot 3, Chitato Original displaced it"},
+      {type:"misplaced", prod:"Kusuka Singkong BBQ 60g", detail:"Found at SNACK 1.4 Slot 5 instead of Slot 4"},
+      {type:"unexpected", prod:"Chitato Mi Goreng 65g (extra facing)", detail:"Duplicate found at SNACK 1.3 Slot 5 — not in this zone's planogram"}
+    ]
+  },
+  snack_2: { score:78, missing:2, misplaced:1, unexpected:2, correct:22,
+    missingAt:[{r:0,s:2},{r:3,s:3}], misplacedAt:[{r:2,s:1}], unexpectedAt:[{r:1,s:4},{r:5,s:5}],
+    unexpectedName:"Chitato Original 68g",
+    issues:[
+      {type:"missing", prod:"Potabee Seaweed 65g", detail:"Expected SNACK 2.1 Slot 3 — product not found"},
+      {type:"missing", prod:"Chiki Twist Jagung Bakar 65g", detail:"Expected SNACK 2.3 Slot 4 — out of stock or not placed"},
+      {type:"misplaced", prod:"Piattos Sapi Panggang 65g", detail:"Found SNACK 1.7 Slot 2 — should be at Slot 3"},
+      {type:"unexpected", prod:"Chitato Original 68g", detail:"Found SNACK 2.2 Slot 5 — belongs in Column 1, not Column 2"},
+      {type:"unexpected", prod:"Momogi Mini Stick Roasted Corn 50g", detail:"Found SNACK 2.5 Slot 6 — wrong slot, planogram ends at Slot 5"}
+    ]
+  },
+  snack_3: { score:90, missing:1, misplaced:1, unexpected:1, correct:27,
+    missingAt:[{r:1,s:2}], misplacedAt:[{r:3,s:0}], unexpectedAt:[{r:5,s:4}],
+    unexpectedName:"Dua Kelinci Sukro 95g (over-faced)",
+    issues:[
+      {type:"missing", prod:"Mayasi Kacang Jepang Garlic 65g", detail:"Expected SNACK 3.2 Slot 3 — not found"},
+      {type:"misplaced", prod:"Garuda Rosta Kac Panggang Pedas 95g", detail:"Found SNACK 3.4 Slot 1 — facings inverted with Bawang variant"},
+      {type:"unexpected", prod:"Dua Kelinci Sukro 95g (extra)", detail:"Extra facing at SNACK 3.6 Slot 5 — planogram allocates 1 facing"}
+    ]
+  },
+  biscuit_1: { score:72, missing:3, misplaced:1, unexpected:2, correct:22,
+    missingAt:[{r:0,s:2},{r:2,s:2},{r:2,s:3}], misplacedAt:[{r:1,s:2}], unexpectedAt:[{r:4,s:2},{r:6,s:0}],
+    unexpectedName:"Nabati Richoco Pch 100g",
+    issues:[
+      {type:"missing", prod:"Oreo Dark & White Choco 105g", detail:"Expected BISCUIT 1.1 Slot 3 — not found on shelf"},
+      {type:"missing", prod:"Milo Biscuit Activ Original 104g", detail:"Expected BISCUIT 1.3 Slot 3 — product missing"},
+      {type:"missing", prod:"Milo Biscuit Activ Milk 104g", detail:"Expected BISCUIT 1.3 Slot 4 — product missing"},
+      {type:"misplaced", prod:"Serena Togo Long Choc Sandwich 128g", detail:"Found BISCUIT 1.2 Slot 3 position swapped with Rasa Kacang variant"},
+      {type:"unexpected", prod:"Nabati Richoco Pch 100g", detail:"Found BISCUIT 1.5 Slot 3 — belongs in Column 3 (Wafer), not Column 1"},
+      {type:"unexpected", prod:"Unibis Bon Bon Chocolate 200g (double-faced)", detail:"BISCUIT 1.7 Slot 1 — 2 facings placed, planogram allows only 1"}
+    ]
+  },
+  biscuit_2: { score:86, missing:1, misplaced:2, unexpected:1, correct:33,
+    missingAt:[{r:2,s:5}], misplacedAt:[{r:3,s:1},{r:5,s:3}], unexpectedAt:[{r:0,s:4}],
+    unexpectedName:"Good Time Rainbow Chocochips 72g (wrong col)",
+    issues:[
+      {type:"missing", prod:"WoCA Krunz Cookies and Cream 90g", detail:"Expected BISCUIT 2.3 Slot 6 — not found"},
+      {type:"misplaced", prod:"Monde Genji Original Pie 70g", detail:"Found BISCUIT 2.4 Slot 2 — swapped position with Raisin variant"},
+      {type:"misplaced", prod:"MyBizcuit Gandum Cokelat 135g", detail:"Found BISCUIT 2.6 Slot 4 instead of Slot 3"},
+      {type:"unexpected", prod:"Good Time Rainbow Chocochips 72g", detail:"Extra facing at BISCUIT 2.1 Slot 5 — row 2.2 product placed in 2.1"}
+    ]
+  },
+  biscuit_3: { score:88, missing:1, misplaced:2, unexpected:1, correct:34,
+    missingAt:[{r:2,s:2}], misplacedAt:[{r:1,s:4},{r:6,s:3}], unexpectedAt:[{r:4,s:2}],
+    unexpectedName:"Oreo Vanilla 105g",
+    issues:[
+      {type:"missing", prod:"Superstar Triple Chocolate 6X16g", detail:"Expected BISCUIT 3.3 Slot 3 — not found"},
+      {type:"misplaced", prod:"Jims Stick Wafer Cappuccino 40g", detail:"Found BISCUIT 3.2 Slot 5 instead of Slot 6 — adjacent slots swapped"},
+      {type:"misplaced", prod:"Mayasi Crepes Choco Banana 75g", detail:"Found BISCUIT 3.7 Slot 4 — Roma Wafello displaced into row 3.7"},
+      {type:"unexpected", prod:"Oreo Vanilla 105g", detail:"Found BISCUIT 3.5 Slot 3 — belongs in Column 1, not Column 3"}
+    ]
+  },
+  biscuit_5: { score:81, missing:2, misplaced:1, unexpected:2, correct:31,
+    missingAt:[{r:2,s:4},{r:2,s:5}], misplacedAt:[{r:4,s:6}], unexpectedAt:[{r:1,s:3},{r:3,s:7}],
+    unexpectedName:"Pocky Double Choco (wrong row)",
+    issues:[
+      {type:"missing", prod:"Pocky Crushed Nuts Milk Almond 25g", detail:"Expected BISCUIT 5.3 Slot 5 — not found"},
+      {type:"missing", prod:"Pocky Milk Flavor 39g", detail:"Expected BISCUIT 5.3 Slot 6 — not found"},
+      {type:"misplaced", prod:"Choki Choki Stix Biscuit", detail:"Found BISCUIT 5.5 Slot 7 — adjacent slot nudged"},
+      {type:"unexpected", prod:"Monde Egg Drops 110g (extra facing)", detail:"Extra facing at BISCUIT 5.2 Slot 4 — over planogram allocation"},
+      {type:"unexpected", prod:"Pocky Double Choco 47g (wrong row)", detail:"Found BISCUIT 5.4 Slot 8 — Apetito Biscuit Stick Pizza expected there"}
+    ]
+  }
+};
+
+// ═══════════════════════════════════
+//  PDF LIBRARY (simulated uploaded files)
+// ═══════════════════════════════════
+let pdfLibrary = [
+  {name:"SNACK3C.pdf", label:"SNACK3C", category:"Snack", date:"01 Apr 2026", products:101, status:"active"},
+  {name:"BISCUIT5H.pdf", label:"BISCUIT5H", category:"Biscuit", date:"17 Mar 2026", products:159, status:"active"},
+];
+
+// ═══════════════════════════════════
+//  STATE
+// ═══════════════════════════════════
+let currentCheckStep = 1;
+let selectedZoneKey = 'snack_1';
+let uploadedPhoto = null;
+
+// ── Full Gondola State ──
+let currentPlanogramId = null;
+let currentPlanogramInfo = null;   // full JSON from /planograms/{id}/info
+let gondolaGrid = null;            // { columns, rowsPerCol, photosPerCol, totalPhotos, photoKeys }
+let uploadedPhotos = {};           // key → File  (e.g. "1.1_1.2" → File)
+
+// ── Frontend-side planogram info cache ──
+// Avoids re-fetching /planograms/{id}/info when the same planogram is selected again.
+// Populated on first successful fetch; cleared on new upload.
+const _planogramInfoCache = {};
+
+// ═══════════════════════════════════
+//  NAV
+// ═══════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map = {dashboard:0,check:1,library:2,upload:3,testing:4};
+  const btns = document.querySelectorAll('.nav-btn');
+  if(map[id]!==undefined) btns[map[id]].classList.add('active');
+  if(id==='library') renderLibrary();
+  if(id==='upload') renderPdfList();
+}
+
+// ═══════════════════════════════════
+//  FULL GONDOLA — PLANOGRAM SELECTION & GRID
+// ═══════════════════════════════════
+
+/** Parse gondola_sections into a grid structure.
+ *  Handles planograms where columns have DIFFERENT numbers of rows
+ *  (e.g. SNACK3C: col1=7 rows, col2=5 rows, col3=6 rows).
+ */
+function parseGondolaGrid(planogramInfo) {
+  const sections = planogramInfo.gondola_sections || [];
+  if (!sections.length) return null;
+
+  // Group sections by column (first part of section_id, e.g. "1" from "1.1")
+  const columns = {};
+  sections.forEach(sec => {
+    const parts = sec.section_id.split('.');
+    const col = parts[0];
+    if (!columns[col]) columns[col] = [];
+    columns[col].push(sec);
+  });
+
+  const colNums = Object.keys(columns).sort((a, b) => Number(a) - Number(b));
+  const numCols = colNums.length;
+
+  // Sort rows within each column
+  colNums.forEach(col => {
+    columns[col].sort((a, b) => {
+      const ra = Number(a.section_id.split('.')[1]);
+      const rb = Number(b.section_id.split('.')[1]);
+      return ra - rb;
+    });
+  });
+
+  // Per-column photo counts (columns can have DIFFERENT row counts)
+  const photosPerColMap = {};
+  colNums.forEach(col => {
+    photosPerColMap[col] = Math.ceil(columns[col].length / 2);
+  });
+
+  // Use max rows across all columns for the preview grid height
+  const maxRowsPerCol = Math.max(...colNums.map(col => columns[col].length));
+  // rowsPerCol kept for backward compat (meta display)
+  const rowsPerCol = maxRowsPerCol;
+
+  // Total photos = sum of per-column photo counts (accounts for uneven columns)
+  const totalPhotos = colNums.reduce((sum, col) => sum + photosPerColMap[col], 0);
+  // photosPerCol = max per column (used for preview grid rows)
+  const photosPerCol = Math.max(...colNums.map(col => photosPerColMap[col]));
+
+  // Build photo keys per column (each slot covers 2 rows)
+  const photoKeys = [];
+  colNums.forEach(col => {
+    const rows = columns[col];
+    const colPhotos = photosPerColMap[col];
+    for (let p = 0; p < colPhotos; p++) {
+      const r1 = rows[p * 2];
+      const r2 = rows[p * 2 + 1];
+      if (!r1) continue; // safety guard
+      const key = r2
+        ? r1.section_id + '_' + r2.section_id
+        : r1.section_id;
+      photoKeys.push({ key, col, sections: r2 ? [r1, r2] : [r1] });
+    }
+  });
+
+  return { columns, colNums, numCols, rowsPerCol, maxRowsPerCol, photosPerCol,
+           photosPerColMap, totalPhotos, photoKeys };
+}
+
+/** Populate the planogram dropdown from /planograms API */
+async function populatePlanogramDropdown() {
+  const sel = document.getElementById('planogramSelect');
+  if (!sel) return;
+  const online = await isBackendOnline();
+  if (!online) {
+    // Fallback: add hardcoded options
+    ['SNACK3C', 'SNACK5C'].forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id; opt.textContent = id;
+      sel.appendChild(opt);
+    });
+    return;
+  }
+  try {
+    const r = await fetch(API_BASE_URL + '/planograms');
+    const data = await r.json();
+    (data.available_planograms || []).forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id; opt.textContent = id;
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    console.warn('[gondola] Could not fetch planogram list:', e);
+  }
+}
+
+/** Called when a planogram is selected from dropdown */
+async function onPlanogramSelected() {
+  const sel = document.getElementById('planogramSelect');
+  const planogramId = sel.value;
+  const preview = document.getElementById('gondolaPreview');
+  const meta = document.getElementById('gondolaMeta');
+  const label = document.getElementById('gondolaLabel');
+  const btn = document.getElementById('continueBtn');
+
+  if (!planogramId) {
+    preview.innerHTML = '<span style="color:var(--gray-400);font-size:13px;">Select a planogram to preview its gondola structure</span>';
+    meta.innerHTML = '';
+    label.textContent = '—';
+    btn.disabled = true;
+    currentPlanogramId = null;
+    currentPlanogramInfo = null;
+    gondolaGrid = null;
+    return;
+  }
+
+  preview.innerHTML = '<span style="color:var(--gray-400);font-size:13px;">Loading planogram data...</span>';
+  label.textContent = planogramId;
+  currentPlanogramId = planogramId;
+
+  try {
+    // Use frontend cache first to avoid redundant /info fetches
+    if (_planogramInfoCache[planogramId]) {
+      console.log('[gondola] Cache hit for', planogramId);
+      currentPlanogramInfo = _planogramInfoCache[planogramId];
+    } else {
+      const r = await fetch(API_BASE_URL + '/planograms/' + encodeURIComponent(planogramId) + '/info');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      currentPlanogramInfo = await r.json();
+      _planogramInfoCache[planogramId] = currentPlanogramInfo;  // store for next time
+    }
+  } catch (e) {
+    preview.innerHTML = '<span style="color:var(--red);font-size:12px;">Failed to load: ' + e.message + '</span>';
+    btn.disabled = true;
+    return;
+  }
+
+  gondolaGrid = parseGondolaGrid(currentPlanogramInfo);
+  if (!gondolaGrid) {
+    preview.innerHTML = '<span style="color:var(--red);font-size:12px;">No sections found in planogram</span>';
+    btn.disabled = true;
+    return;
+  }
+
+  // Render gondola preview grid
+  renderGondolaPreview(preview, gondolaGrid, currentPlanogramInfo);
+
+  // Meta tags
+  const totalProducts = currentPlanogramInfo.total_products || 0;
+  // Per-column row summary e.g. "7 / 5 / 6 rows"
+  const rowSummary = gondolaGrid.colNums.map(col => gondolaGrid.columns[col].length).join(' / ');
+  meta.innerHTML =
+    '<span class="tag tag-blue">' + planogramId + '.pdf</span>' +
+    '<span class="tag tag-gray">' + gondolaGrid.numCols + ' columns</span>' +
+    '<span class="tag tag-gray">' + rowSummary + ' rows</span>' +
+    '<span class="tag tag-gray">' + gondolaGrid.totalPhotos + ' photos needed</span>' +
+    '<span class="tag tag-gray">' + totalProducts + ' products</span>' +
+    '<span class="tag tag-green">Active</span>';
+
+  btn.disabled = false;
+  uploadedPhotos = {};
+}
+
+/** Render a mini preview of the gondola structure.
+ *  Uses maxRowsPerCol so all columns are shown even if uneven.
+ */
+function renderGondolaPreview(container, grid, info) {
+  const cols = grid.colNums;
+  let html = '<div class="gondola-preview-grid" style="grid-template-columns:repeat(' + cols.length + ',1fr);">';
+
+  // Column headers with per-column row count
+  cols.forEach(col => {
+    html += '<div class="gondola-preview-cell header">COL ' + col +
+      ' <span style="font-size:8px;opacity:0.7;">(' + grid.columns[col].length + 'R)</span></div>';
+  });
+
+  // Section rows — use maxRowsPerCol so we never miss a row in the tallest column
+  for (let r = 0; r < grid.maxRowsPerCol; r++) {
+    cols.forEach(col => {
+      const sec = grid.columns[col][r];  // undefined if this col has fewer rows — safe
+      if (!sec) { html += '<div class="gondola-preview-cell" style="opacity:0.3;">—</div>'; return; }
+      const prodCount = (sec.products || []).length;
+      html += '<div class="gondola-preview-cell" title="' + (sec.description || '') + '">' +
+        '<div style="font-weight:600;font-size:9px;color:var(--gray-700);">' + sec.section_id + '</div>' +
+        '<div>' + prodCount + ' items</div>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/** Build the photo upload grid for Step 2.
+ *  Each column is rendered independently using its own photosPerColMap count,
+ *  so columns with fewer rows don't generate phantom empty slots.
+ */
+function buildPhotoUploadGrid() {
+  const container = document.getElementById('photoGrid');
+  if (!container || !gondolaGrid) return;
+
+  const grid = gondolaGrid;
+  const cols = grid.colNums;
+
+  // Build column arrays independently, then interleave by photo-row
+  // so CSS grid (columns × rows) stays correct.
+  const colSlots = {}; // col → array of HTML strings (one per photo slot)
+  cols.forEach(col => {
+    colSlots[col] = [];
+    const rows = grid.columns[col];
+    const colPhotos = grid.photosPerColMap[col];
+    for (let p = 0; p < colPhotos; p++) {
+      const sec1 = rows[p * 2];
+      const sec2 = rows[p * 2 + 1];
+      if (!sec1) continue; // safety guard
+      const secIds = sec2
+        ? sec1.section_id + ' & ' + sec2.section_id
+        : sec1.section_id;
+      const key = sec2
+        ? sec1.section_id + '_' + sec2.section_id
+        : sec1.section_id;
+      const inputId = 'photo_' + key.replace(/\./g, '-');
+      const hasPhoto = !!uploadedPhotos[key];
+
+      let slot = '<div class="photo-slot' + (hasPhoto ? ' has-photo' : '') +
+        '" id="slot_' + inputId + '" onclick="document.getElementById(\'' + inputId + '\').click()">' +
+        '<input type="file" id="' + inputId + '" accept="image/*" onchange="handleGridPhotoUpload(event, \'' + key + '\')">' +
+        '<div class="slot-label">' + secIds + '</div>';
+      if (hasPhoto) {
+        slot += '<div class="slot-icon">✅</div>' +
+          '<div class="slot-hint" style="color:var(--green);">' + uploadedPhotos[key].name + '</div>';
+      } else {
+        slot += '<div class="slot-icon">📷</div>' +
+          '<div class="slot-hint">Tap to upload photo</div>';
+      }
+      slot += '</div>';
+      colSlots[col].push(slot);
+    }
+  });
+
+  // Render: header row then interleave per photo-row index
+  let html = '<div class="photo-grid" style="grid-template-columns:repeat(' + cols.length + ',1fr);">';
+  cols.forEach(col => {
+    html += '<div class="photo-grid-header">COLUMN ' + col + '</div>';
+  });
+
+  // Render row by row across all columns (empty cell if this col has no more photos)
+  for (let p = 0; p < grid.photosPerCol; p++) {
+    cols.forEach(col => {
+      if (p < colSlots[col].length) {
+        html += colSlots[col][p];
+      } else {
+        // This column has fewer photo slots — render an empty filler cell
+        html += '<div class="photo-slot" style="opacity:0.25;pointer-events:none;">' +
+          '<div class="slot-icon">—</div></div>';
+      }
+    });
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  updateUploadCount();
+}
+
+/** Handle photo upload for a specific grid slot */
+function handleGridPhotoUpload(event, key) {
+  const file = event.target.files[0];
+  if (!file) return;
+  uploadedPhotos[key] = file;
+  buildPhotoUploadGrid(); // re-render grid to show updated state
+}
+
+/** Update the upload count badge and analyze button state */
+function updateUploadCount() {
+  const countEl = document.getElementById('uploadCount');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  if (!gondolaGrid) return;
+
+  const uploaded = Object.keys(uploadedPhotos).length;
+  const total = gondolaGrid.totalPhotos;
+
+  if (countEl) {
+    countEl.textContent = uploaded + ' / ' + total + ' uploaded';
+    if (uploaded === total) {
+      countEl.style.background = 'var(--green-pale)';
+      countEl.style.color = 'var(--green)';
+    } else {
+      countEl.style.background = 'var(--gray-100)';
+      countEl.style.color = 'var(--gray-600)';
+    }
+  }
+
+  // Enable analyze button when at least 1 photo is uploaded
+  if (analyzeBtn) {
+    analyzeBtn.disabled = uploaded === 0;
+  }
+}
+
+// ═══════════════════════════════════
+//  SHELF RENDERER
+// ═══════════════════════════════════
+function shortN(s) { return s.length > 14 ? s.substring(0,13)+'…' : s; }
+
+function renderShelf(containerId, planKey, result, annotate) {
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const plan = PLANS[planKey];
+  c.innerHTML = '';
+  plan.rows.forEach((row, ri) => {
+    const sec = document.createElement('div');
+    sec.className = 'shelf-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'shelf-row-label';
+    lbl.innerHTML = `<strong>${row.id}</strong> <span style="font-weight:400;">${row.h}</span>`;
+    sec.appendChild(lbl);
+    const slots = document.createElement('div');
+    slots.className = 'shelf-slots';
+    row.slots.forEach((prod, si) => {
+      const s = document.createElement('div');
+      s.className = 'slot';
+      let cls = '';
+      if(annotate && result) {
+        if(result.missingAt && result.missingAt.some(x=>x.r===ri&&x.s===si)) cls='missing';
+        else if(result.misplacedAt && result.misplacedAt.some(x=>x.r===ri&&x.s===si)) cls='misplaced';
+        else if(result.unexpectedAt && result.unexpectedAt.some(x=>x.r===ri&&x.s===si)) cls='unexpected';
+        else cls='correct';
+      }
+      if(cls) s.classList.add(cls);
+      const num = document.createElement('span');
+      num.className = 'slot-num';
+      num.textContent = 'S'+(si+1);
+      s.appendChild(num);
+      if(cls==='missing') {
+        s.innerHTML += `<span class="slot-status" style="color:var(--red);">—</span><span style="font-size:9px;color:var(--red);">missing</span>`;
+      } else if(cls==='unexpected') {
+        s.innerHTML += `<span class="slot-status" style="color:var(--amber);">!</span><span style="font-size:9px;">${shortN(result.unexpectedName||prod)}</span>`;
+      } else {
+        if(cls==='correct') s.innerHTML += `<span class="slot-status" style="color:#16A34A;">✓</span>`;
+        if(cls==='misplaced') s.innerHTML += `<span class="slot-status" style="color:#BE185D;">⚠</span>`;
+        s.innerHTML += `<span>${shortN(prod)}</span>`;
+      }
+      slots.appendChild(s);
+    });
+    sec.appendChild(slots);
+    c.appendChild(sec);
+  });
+}
+
+// ═══════════════════════════════════
+//  PDF PLANOGRAM VIEWER
+// ═══════════════════════════════════
+let _pdfVid = 0;
+const _pdfPages = {};
+const _brandColors = [
+  ['pocky','#C2185B'],['oreo','#212121'],['pringles','#C62828'],
+  ['chitato','#E65100'],['tango','#1565C0'],['nabati','#E53935'],
+  ['good time','#D32F2F'],['regal','#5D4037'],['milo','#2E7D32'],
+  ['lays','#F9A825'],['roma','#1976D2'],['monde','#6A1B9A'],
+  ['garuda','#6D4C41'],['nissin','#B71C1C'],['potabee','#558B2F'],
+  ['japota','#BF360C'],['chiki','#E65100'],['mayasi','#00695C'],
+  ['astor','#4527A0'],['loacker','#4E342E'],['hello panda','#AD1457'],
+  ['tic tac','#1B5E20'],['dua kelinci','#0D47A1'],['kusuka','#827717'],
+  ['maxicorn','#E64A19'],['chuba','#4A148C'],['happytos','#1A237E'],
+  ['lemonilo','#2E7D32'],['biskies','#37474F'],['khong guan','#B71C1C'],
+  ['ritz','#1565C0'],['imperial','#880E4F'],['qtela','#388E3C'],
+  ['taro','#0277BD'],['kokola','#4E342E'],['mooochii','#F06292'],
+  ['loacker','#795548'],['woca','#00838F'],['nabati','#E53935'],
+];
+function _brandColor(name) {
+  const n = name.toLowerCase();
+  for (const [b, c] of _brandColors) { if (n.includes(b)) return c; }
+  let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) & 0xffff;
+  return `hsl(${h % 330},52%,36%)`;
+}
+function _shortProd(s) {
+  // Strip weight at end, shorten brand name
+  return s.replace(/\s*\d+[gGxX][\w.]*$/, '').trim().replace(/(.{18}).*/, '$1…');
+}
+
+// Map each PDF file to its ordered zone keys
+const PDF_ZONES = {
+  'SNACK3C.pdf':   ['snack_1','snack_2','snack_3'],
+  'BISCUIT5H.pdf': ['biscuit_1','biscuit_2','biscuit_3','biscuit_5'],
+};
+// Short column labels as they appear in the Spaceman PDF
+const PDF_COL_LABELS = {
+  'SNACK3C.pdf':   ['COL 1','COL 2','COL 3'],
+  'BISCUIT5H.pdf': ['COL 1','COL 2','COL 3','COL 5'],
+};
+
+function buildPdfPageHTML(planFile) {
+  const pdfUrl = getPlanogramPdfUrl(planFile);
+  const configured = supabaseConfigured();
+
+  if (!configured) {
+    // Pretty placeholder shown until Supabase keys are filled in
+    return `<div style="
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        background:linear-gradient(135deg,#f0f4f0,#e8f0e8);
+        border-radius:8px;padding:36px 24px;text-align:center;gap:12px;min-height:260px;">
+      <div style="font-size:40px;">📄</div>
+      <div style="font-weight:600;font-size:14px;color:var(--gray-800);">${planFile}</div>
+      <div style="font-size:12px;color:var(--gray-500);max-width:260px;line-height:1.7;">
+        PDF will load here once Supabase is connected.<br>
+        Set <code style="background:#e0e8e0;padding:1px 5px;border-radius:3px;">SUPABASE_URL</code>
+        and <code style="background:#e0e8e0;padding:1px 5px;border-radius:3px;">SUPABASE_ANON_KEY</code>
+        in the script config.
+      </div>
+      <div style="margin-top:4px;font-size:11px;color:var(--green);font-weight:500;">
+        ● Upload to: <code style="font-size:11px;">planograms/${planFile}</code> bucket
+      </div>
+    </div>`;
+  }
+
+  return `<div class="pdf-doc-wrap" style="padding:0;background:#374151;position:relative;">
+    <iframe
+      id="pdfFrame_${planFile.replace('.','_')}"
+      src="${pdfUrl}"
+      type="application/pdf"
+      title="${planFile}"
+      style="width:100%;height:520px;border:none;display:block;"
+      onload="this.nextElementSibling.style.display='none'">
+    </iframe>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#1f2937;color:rgba(255,255,255,0.7);text-align:center;padding:24px;pointer-events:none;">
+      <div style="font-size:32px;">📄</div>
+      <div style="font-size:13px;font-weight:500;">Loading ${planFile}…</div>
+      <div style="font-size:11px;opacity:0.5;">From ${pdfUrl.includes('localhost') ? 'backend server' : 'Supabase storage'}</div>
+    </div>
+    <div style="position:absolute;bottom:10px;right:10px;z-index:5;">
+      <a href="${pdfUrl}" target="_blank"
+         style="background:rgba(0,0,0,0.6);color:white;font-size:11px;padding:5px 10px;border-radius:6px;text-decoration:none;font-family:Sora,sans-serif;">
+        ↗ Open in new tab
+      </a>
+    </div>
+  </div>`;
+}
+
+function renderPlanogramRef(containerId, planKey) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const plan = PLANS[planKey];
+  const vid = 'pv' + (++_pdfVid);
+  _pdfPages[vid] = 1;
+
+  const pdfMeta = {
+    'SNACK3C.pdf':  { date:'01 April 2026', time:'11:39:16' },
+    'BISCUIT5H.pdf':{ date:'17 Maret 2026', time:'8:51:14'  }
+  };
+  const meta = pdfMeta[plan.file] || { date:'—', time:'—' };
+  const total = plan.rows.reduce((a, r) => a + r.slots.length, 0);
+
+  // ── Slide 1: Shelf Diagram ──
+  let shelfHTML = '<div class="pdf-shelf-diagram">';
+  plan.rows.forEach(row => {
+    let prods = '';
+    row.slots.forEach(prod => {
+      const col = _brandColor(prod);
+      prods += `<div class="pdf-pblock" style="border-color:${col}55;background:${col}14;">
+        <span class="pdf-pname" style="color:${col};">${_shortProd(prod)}</span>
+      </div>`;
+    });
+    shelfHTML += `<div class="pdf-shelf-row">
+      <div class="pdf-row-lbl">
+        <span>${row.id}</span>
+        <span class="rh">${row.h}</span>
+      </div>
+      <div class="pdf-shelf-prods">${prods}</div>
+    </div>`;
+  });
+  shelfHTML += '</div>';
+
+  // ── Slide 3: Full PDF Page ──
+  const fullPdfHTML = buildPdfPageHTML(plan.file, planKey);
+
+  // ── Slide 2: Position Table ──
+  let tableHTML = '<div class="pdf-tbl-wrap"><table class="pdf-tbl"><thead><tr>' +
+    '<th style="width:28px">#</th><th>Product</th>' +
+    '<th style="text-align:center;width:40px">Fac</th>' +
+    '<th style="text-align:center;width:44px">Units</th>' +
+    '</tr></thead><tbody>';
+  const unitMap = {0:10,1:10,2:10,3:8,4:8,5:6,6:6,7:4};
+  plan.rows.forEach((row, ri) => {
+    tableHTML += `<tr class="pdf-sec-row"><td colspan="4">
+      <span style="font-family:'DM Mono',monospace;">${row.id}</span>
+      &nbsp;·&nbsp;${row.h}&nbsp;·&nbsp;${row.slots.length} SKU
+    </td></tr>`;
+    row.slots.forEach((prod, si) => {
+      const col = _brandColor(prod);
+      tableHTML += `<tr>
+        <td style="font-weight:600;color:var(--gray-400);font-family:'DM Mono',monospace;">${si+1}</td>
+        <td><div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:${col};flex-shrink:0;"></div>
+          <span>${prod}</span>
+        </div></td>
+        <td style="text-align:center;color:var(--gray-600);">1</td>
+        <td style="text-align:center;color:var(--gray-600);">${unitMap[ri] || 4}</td>
+      </tr>`;
+    });
+  });
+  tableHTML += '</tbody></table></div>';
+
+  // Default to slide 3 (PDF document view)
+  _pdfPages[vid] = 3;
+
+  c.innerHTML = `<div class="pdf-viewer">
+    <div class="pdf-hdr">
+      <div>
+        <div class="pdf-hdr-title">${plan.id}</div>
+        <div class="pdf-hdr-sub">${plan.label}</div>
+      </div>
+      <div class="pdf-hdr-right">
+        <div class="pdf-hdr-meta">📄 ${plan.file}</div>
+        <div class="pdf-hdr-meta">${meta.date} · ${meta.time}</div>
+        <div class="pdf-hdr-meta">${plan.rows.length} rows · ${total} SKUs</div>
+      </div>
+    </div>
+    <div class="pdf-slides-wrap">
+      <div class="pdf-slide" id="${vid}_s1">${shelfHTML}</div>
+      <div class="pdf-slide" id="${vid}_s2">${tableHTML}</div>
+      <div class="pdf-slide active" id="${vid}_s3">${fullPdfHTML}</div>
+    </div>
+    <div class="pdf-nav">
+      <button class="pdf-nav-btn" id="${vid}_prev" onclick="pdfNav('${vid}',-1)">‹ Prev</button>
+      <div class="pdf-page-ind">
+        <span class="pdf-dot" id="${vid}_d1" title="Shelf Diagram"></span>
+        <span class="pdf-dot" id="${vid}_d2" title="Position Table"></span>
+        <span class="pdf-dot on" id="${vid}_d3" title="PDF Document"></span>
+        <span id="${vid}_lbl" style="font-size:11px;color:var(--gray-500);">PDF Document</span>
+      </div>
+      <button class="pdf-nav-btn" id="${vid}_next" onclick="pdfNav('${vid}',1)" disabled>Next ›</button>
+    </div>
+  </div>`;
+}
+
+const _slideLabels = ['Shelf View', 'Position Table', 'PDF Document'];
+function pdfNav(vid, dir) {
+  const cur = _pdfPages[vid] || 1;
+  const nxt = Math.max(1, Math.min(3, cur + dir));
+  if (nxt === cur) return;
+  document.getElementById(vid+'_s'+cur).classList.remove('active');
+  document.getElementById(vid+'_s'+nxt).classList.add('active');
+  _pdfPages[vid] = nxt;
+  document.getElementById(vid+'_prev').disabled = nxt === 1;
+  document.getElementById(vid+'_next').disabled = nxt === 3;
+  for (let i = 1; i <= 3; i++)
+    document.getElementById(vid+'_d'+i).className = 'pdf-dot' + (nxt===i?' on':'');
+  document.getElementById(vid+'_lbl').textContent = _slideLabels[nxt-1];
+}
+
+// ═══════════════════════════════════
+//  CHECK WIZARD
+// ═══════════════════════════════════
+function updateWizard(n) {
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('wd'+i);
+    const l=document.getElementById('wl'+i);
+    if(i<n){ d.className='wdot done'; d.textContent='✓'; l.className='wlabel'; }
+    else if(i===n){ d.className='wdot active'; d.textContent=String(i); l.className='wlabel active'; }
+    else { d.className='wdot idle'; d.textContent=String(i); l.className='wlabel'; }
+  }
+}
+
+function goCheckStep(n) {
+  for(let i=1;i<=4;i++) { const el=document.getElementById('cs'+i); if(el) el.style.display='none'; }
+  const el = document.getElementById('cs'+n);
+  if(el){ el.style.display='block'; el.classList.add('fade-in'); }
+  currentCheckStep = n;
+  updateWizard(n);
+  if(n===1) initStep1();
+  if(n===2) initStep2();
+  if(n===3) runAnalysis();
+}
+
+function initStep1() {
+  // Populate planogram dropdown if not already done
+  const sel = document.getElementById('planogramSelect');
+  if (sel && sel.options.length <= 1) {
+    populatePlanogramDropdown();
+  }
+}
+
+function initStep2() {
+  // Build the photo upload grid based on selected planogram
+  if (currentPlanogramId && gondolaGrid) {
+    const badge = document.getElementById('planogramBadge');
+    if (badge) badge.textContent = currentPlanogramId;
+    buildPhotoUploadGrid();
+  }
+}
+
+// ═══════════════════════════════════
+//  RESPONSE TRANSFORMER
+//  Maps backend's flat lists → frontend grid positions
+// ═══════════════════════════════════
+function _simStr(a, b) {
+  a = a.toLowerCase().trim(); b = b.toLowerCase().trim();
+  if (a === b) return 1;
+  if (a.includes(b) || b.includes(a)) return 0.85;
+  const wa = new Set(a.split(/\s+/));
+  const wb = new Set(b.split(/\s+/));
+  let common = 0;
+  wa.forEach(w => { if (wb.has(w)) common++; });
+  return common / Math.max(wa.size, wb.size);
+}
+
+function findSlotByName(plan, name) {
+  let best = null, bestScore = 0;
+  for (let ri = 0; ri < plan.rows.length; ri++) {
+    for (let si = 0; si < plan.rows[ri].slots.length; si++) {
+      const sc = _simStr(plan.rows[ri].slots[si], name);
+      if (sc > bestScore) { bestScore = sc; best = { r: ri, s: si }; }
+    }
+  }
+  return bestScore >= 0.55 ? best : null;
+}
+
+function transformApiResponse(api, zoneKey) {
+  const plan = PLANS[zoneKey];
+  const missing = api.missing_from_shelf || [];
+  const extra   = api.not_in_planogram   || [];
+  const found   = api.found_on_shelf     || [];
+  const detectedWithPositions = api.detected_with_positions || [];
+
+  // Filter to only products in this specific column/zone
+  const allZoneProducts = [];
+  plan.rows.forEach((row, ri) => {
+    row.slots.forEach((prod, si) => {
+      allZoneProducts.push({ r: ri, s: si, name: prod });
+    });
+  });
+
+  const missingAt = [], unexpectedAt = [], issues = [];
+
+  // Missing: find their grid position
+  missing.forEach(name => {
+    const slot = findSlotByName(plan, name);
+    if (slot) {
+      missingAt.push(slot);
+      issues.push({
+        type: 'missing', prod: name,
+        detail: 'Expected ' + plan.rows[slot.r].id + ' Slot ' + (slot.s + 1) + ' — not found on shelf'
+      });
+    }
+  });
+
+  // Unexpected: no planogram slot — assign to visible edge positions
+  extra.forEach((name, idx) => {
+    const ri = Math.min(plan.rows.length - 1, idx % plan.rows.length);
+    const si = plan.rows[ri].slots.length - 1;
+    unexpectedAt.push({ r: ri, s: si });
+    issues.push({
+      type: 'unexpected', prod: name,
+      detail: 'Found on shelf — not in planogram for this zone'
+    });
+  });
+
+  return {
+    score: api.compliance_score,
+    correct: found.length,
+    missing: missingAt.length,
+    misplaced: 0,
+    unexpected: unexpectedAt.length,
+    missingAt: missingAt,
+    misplacedAt: [],
+    unexpectedAt: unexpectedAt,
+    issues: issues,
+    detectedWithPositions: detectedWithPositions,  // bbox overlay data from AI
+    _raw: api   // keep raw response for JSON display
+  };
+}
+
+// ═══════════════════════════════════
+//  ANALYSIS ENGINE (real + simulated)
+// ═══════════════════════════════════
+function _analysisUI() {
+  return {
+    sb: document.getElementById('streamBox'),
+    pct: document.getElementById('pctLabel'),
+    pb: document.getElementById('progressBar'),
+    status: document.getElementById('aiStatusText'),
+    badge: document.getElementById('aiBadge'),
+    avatar: document.getElementById('aiAvatar'),
+    log(msg) { this.sb.textContent += (this.sb.textContent ? '\n' : '') + msg; this.sb.scrollTop = this.sb.scrollHeight; },
+    progress(p) { this.pb.style.width = p + '%'; this.pct.textContent = p + '%'; },
+    done(score) {
+      document.querySelectorAll('.a-step').forEach(el => el.className = 'a-step done');
+      document.querySelectorAll('.a-step-icon').forEach(el => el.textContent = '✅');
+      this.badge.innerHTML = '✓ Done'; this.badge.style.background = 'var(--green-pale)'; this.badge.style.color = 'var(--green)';
+      this.avatar.textContent = '✅';
+      this.progress(100);
+      this.status.textContent = 'Analysis complete — ' + score + '% compliance';
+    }
+  };
+}
+
+function _initStepUI(stepDefs) {
+  const stepsDiv = document.getElementById('analysisSteps');
+  stepsDiv.innerHTML = stepDefs.map((s, i) =>
+    '<div class="a-step" id="as' + i + '"><span class="a-step-icon" id="ai' + i + '">⏳</span><span>' + s + '</span></div>'
+  ).join('');
+}
+
+function _advanceStep(idx, total, ui, stepDefs) {
+  for (let i = 0; i < idx; i++) {
+    const ic = document.getElementById('ai' + i); if (ic) ic.textContent = '✅';
+    const st = document.getElementById('as' + i); if (st) st.className = 'a-step done';
+  }
+  const cur = document.getElementById('as' + idx);
+  if (cur) cur.className = 'a-step active';
+  ui.status.textContent = stepDefs[idx] + '…';
+  ui.progress(Math.round(((idx + 1) / total) * 85));
+}
+
+// ── Get expected products for a section key from planogram info ───────────────
+function getSectionExpectedProducts(key) {
+  if (!currentPlanogramInfo) return [];
+  const secIds = key.split('_');
+  const allSections = currentPlanogramInfo.gondola_sections || [];
+  const products = [];
+  secIds.forEach(sid => {
+    const sec = allSections.find(s => s.section_id === sid);
+    if (sec) products.push(...(sec.products || []).map(p => p.product_name));
+  });
+  return products;
+}
+
+async function runAnalysis() {
+  const store       = document.getElementById('storeSelect').value;
+  const planogramId = currentPlanogramId;
+  const ui          = _analysisUI();
+  ui.sb.textContent = '';
+
+  // Only send pair keys (format "x.y_x.z") — /check-positions requires pairs
+  const pairKeys   = Object.keys(uploadedPhotos).filter(k => k.includes('_'));
+  const photoCount = pairKeys.length;
+  const online     = await isBackendOnline();
+
+  if (!online || !photoCount || !planogramId) {
+    if (!online)      ui.log('[system] Backend not reachable — check that the server is running');
+    if (!photoCount)  ui.log('[system] No photos uploaded');
+    if (!planogramId) ui.log('[system] No planogram selected');
+    ui.status.textContent = 'Cannot run analysis';
+    ui.badge.innerHTML = '○ Waiting';
+    ui.badge.style.background = 'var(--amber-pale)';
+    ui.badge.style.color = 'var(--amber)';
+    return;
+  }
+
+  const colsChecked = [...new Set(pairKeys.map(k => k.split('.')[0]))].sort();
+  const stepDefs = [
+    'Sending ' + photoCount + ' section photos to Gemini Vision',
+    'AI position-by-position detection per section',
+    'Comparing detected positions to planogram',
+    'Building visual compliance report'
+  ];
+  _initStepUI(stepDefs);
+  _advanceStep(0, stepDefs.length, ui, stepDefs);
+  ui.log('[system] Backend online — ' + planogramId + ' · cols ' + colsChecked.join(', ') + ' · ' + photoCount + ' photos · ' + store);
+  ui.log('[gondola] Sending to /check-positions (same engine as testing tab)…');
+
+  const t0 = Date.now();
+
+  const formData = new FormData();
+  formData.append('planogram_id', planogramId);
+  formData.append('store_id', store);
+  pairKeys.forEach(k => {
+    formData.append('section_pair_keys', k);
+    formData.append('section_photos', uploadedPhotos[k]);
+  });
+
+  _advanceStep(1, stepDefs.length, ui, stepDefs);
+  ui.log('[api] Pipeline: image → position JSON → planogram compare…');
+
+  let pulsePct = 20;
+  const pulseTimer = setInterval(() => {
+    if (pulsePct < 88) { pulsePct += 8; ui.progress(pulsePct); }
+  }, 15000);
+
+  let data;
+  try {
+    const resp = await fetch(API_BASE_URL + '/check-positions', { method: 'POST', body: formData });
+    clearInterval(pulseTimer);
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: 'HTTP ' + resp.status }));
+      throw new Error(err.detail || 'Server error');
+    }
+    data = await resp.json();
+  } catch (e) {
+    clearInterval(pulseTimer);
+    ui.log('[error] ' + e.message);
+    ui.status.textContent = 'Error — ' + e.message;
+    ui.badge.innerHTML = '✗ Error';
+    ui.badge.style.background = 'var(--red-pale)';
+    ui.badge.style.color = 'var(--red)';
+    return;
+  }
+
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  _advanceStep(2, stepDefs.length, ui, stepDefs);
+  _advanceStep(3, stepDefs.length, ui, stepDefs);
+
+  // Log per-row summary
+  (data.photos || []).forEach(photo => {
+    [photo.row1, photo.row2].forEach(r => {
+      if (!r || !r.section_id) return;
+      const pos = r.position_results || [];
+      const correct = pos.filter(p => p.status === 'correct').length;
+      const wrong   = pos.filter(p => p.status === 'wrong_product').length;
+      const missing = pos.filter(p => p.status === 'missing').length;
+      ui.log('[' + r.section_id + '] ' + correct + ' correct · ' + wrong + ' wrong · ' + missing + ' missing');
+    });
+  });
+
+  ui.log('[done] ' + elapsed + 's — overall score: ' + data.compliance_score + '%');
+  ui.done(data.compliance_score || 0);
+
+  _lastApiResult = data;
+  setTimeout(function() { goCheckStep(4); renderFullGondolaResult(data); }, 700);
+}
+
+function runSimulatedAnalysis() {
+  const plan = PLANS[selectedZoneKey];
+  const result = RESULTS[selectedZoneKey];
+  const store = document.getElementById('storeSelect').value;
+  const ui = _analysisUI();
+
+  const stepDefs = [
+    'Loading planogram data',
+    'Sending images to Gemini Vision API',
+    'Reading product labels on shelf photo',
+    'Mapping detected positions to planogram grid',
+    'Computing compliance score + building JSON'
+  ];
+  _initStepUI(stepDefs);
+
+  // Build simulated log lines
+  const lines = [
+    '[system] Simulated compliance check for ' + plan.id,
+    '[pdf_extractor] Loading ' + plan.file + '…',
+    '[pdf_extractor] Extracted planogram from page 2',
+    '[vision] Sending 2 images to Gemini 2.5 Pro…',
+    '[vision] Scanning shelf photo top-to-bottom…',
+  ];
+  plan.rows.forEach(function(row) {
+    lines.push('[vision] ' + row.id + ' (' + row.h + '): reading ' + row.slots.length + ' facings…');
+  });
+  if (result.missingAt.length > 0)    lines.push('[vision] ⚠ ' + result.missingAt.length + ' empty slot(s) detected');
+  if (result.misplacedAt.length > 0)  lines.push('[vision] ⚠ ' + result.misplacedAt.length + ' misplaced product(s) found');
+  if (result.unexpectedAt.length > 0) lines.push('[vision] ⚠ ' + result.unexpectedAt.length + ' unexpected product(s) detected');
+  lines.push('[result] Compliance score: ' + result.score + '%');
+  lines.push('[supabase] Logging result to compliance_logs…');
+  lines.push('[done] Response ready for ' + store);
+
+  let li = 0, si = 0;
+  function tick() {
+    if (li < lines.length) {
+      ui.log(lines[li++]);
+      const p = Math.round((li / lines.length) * 100);
+      ui.progress(p);
+      const sIdx = Math.min(stepDefs.length - 1, Math.floor((li / lines.length) * stepDefs.length));
+      if (sIdx > si) {
+        document.getElementById('ai' + si).textContent = '✅';
+        document.getElementById('as' + si).className = 'a-step done';
+        si = sIdx;
+        document.getElementById('as' + si).className = 'a-step active';
+        ui.status.textContent = stepDefs[si] + '…';
+      }
+      setTimeout(tick, li < 5 ? 550 : 420);
+    } else {
+      ui.done(result.score);
+      setTimeout(function() { goCheckStep(4); renderResult(); }, 700);
+    }
+  }
+  setTimeout(tick, 300);
+}
+
+function renderResult() {
+  const plan = PLANS[selectedZoneKey];
+  const result = RESULTS[selectedZoneKey];
+  const store = document.getElementById('storeSelect').value;
+  const totalIssues = result.missing + result.misplaced + result.unexpected;
+  const scoreColor  = result.score >= 90 ? '#16A34A' : result.score >= 75 ? '#D97706' : '#DC2626';
+  const scoreBorder = result.score >= 90 ? '#86EFAC' : result.score >= 75 ? '#FCD34D' : '#FCA5A5';
+  const scoreBg     = result.score >= 90
+    ? 'linear-gradient(135deg,#dcfce7,#bbf7d0)'
+    : result.score >= 75
+      ? 'linear-gradient(135deg,#fef3c7,#fde68a)'
+      : 'linear-gradient(135deg,#fee2e2,#fecaca)';
+  const scoreLabel  = result.score >= 90 ? '✓ Pass' : result.score >= 75 ? '⚠ Needs Review' : '✗ Fail';
+  const badgeCls    = result.score >= 90 ? 'badge-green' : result.score >= 75 ? 'badge-amber' : 'badge-red';
+
+  const jsonPayload = JSON.stringify({
+    planogram_id: plan.id, store_id: store,
+    status: result.score >= 90 ? 'pass' : 'fail',
+    compliance_score: result.score,
+    issues: result.issues.map(i => ({type:i.type, product:i.prod, note:i.detail})),
+    correct_count: result.correct,
+    summary: 'Zone '+plan.id+': '+totalIssues+' issue(s) — '+result.missing+' missing, '+result.misplaced+' misplaced, '+result.unexpected+' unexpected. '+result.correct+' correctly placed.',
+    timestamp: new Date().toISOString()
+  }, null, 2);
+
+  document.getElementById('resultContent').innerHTML =
+    // ── Score Banner ──
+    '<div class="card" style="margin-bottom:14px;background:'+scoreBg+';border-color:'+scoreBorder+';"><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
+      +'<div class="score-ring" style="border-color:'+scoreColor+';"><span class="snum" style="color:'+scoreColor+';">'+result.score+'%</span><span class="slbl" style="color:'+scoreColor+';">compliance</span></div>'
+      +'<div style="flex:1;min-width:160px;">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
+          +'<span style="font-size:17px;font-weight:700;color:'+scoreColor+';">'+scoreLabel+'</span>'
+          +'<span class="badge '+badgeCls+'">'+plan.id+'</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--gray-600);margin-bottom:8px;">'+store+' · '+new Date().toLocaleString('id-ID')+'</div>'
+        +'<div class="comp-bar-track"><div id="compFill" class="comp-bar-fill" style="background:'+scoreColor+';"></div></div>'
+        +'<div style="font-size:10px;color:var(--gray-600);margin-top:4px;">'+result.correct+' correct · '+result.missing+' missing · '+result.misplaced+' misplaced · '+result.unexpected+' unexpected</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0;">'
+        +'<div class="stat-box" style="border-color:#86EFAC;"><div class="sbn" style="color:#16A34A;">'+result.correct+'</div><div class="sbl" style="color:#16A34A;">Correct</div></div>'
+        +'<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">'+result.missing+'</div><div class="sbl" style="color:#DC2626;">Missing</div></div>'
+        +'<div class="stat-box" style="border-color:#D8B4FE;"><div class="sbn" style="color:#9333EA;">'+result.misplaced+'</div><div class="sbl" style="color:#9333EA;">Misplaced</div></div>'
+        +'<div class="stat-box" style="border-color:#FCD34D;"><div class="sbn" style="color:#D97706;">'+result.unexpected+'</div><div class="sbl" style="color:#D97706;">Unexpected</div></div>'
+      +'</div>'
+    +'</div></div>'
+
+    // ── Compliance Map ──
+    +'<div class="card" style="margin-bottom:14px;">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">'
+        +'<div><div class="section-label">Compliance Map</div>'
+        +'<div style="font-size:11px;color:var(--gray-500);margin-top:1px;">Hover over any slot for product details · colored boxes = compliance status</div></div>'
+        +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
+          +'<button class="btn btn-sm" id="overlayToggle" onclick="toggleOverlay()" style="font-size:11px;">👁 Hide overlay</button>'
+          +'<div class="comp-tabs">'
+            +'<button class="comp-tab active" id="ctab_side" onclick="switchCompTab(\'side\')">Side by side</button>'
+            +'<button class="comp-tab" id="ctab_photo" onclick="switchCompTab(\'photo\')">Photo only</button>'
+            +'<button class="comp-tab" id="ctab_ref" onclick="switchCompTab(\'ref\')">Reference only</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+
+      // Side-by-side
+      +'<div id="compViewSide" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
+        +'<div>'
+          +'<div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:5px;">'
+            +'<span style="width:8px;height:8px;background:var(--green);border-radius:2px;display:inline-block;"></span>Planogram reference'
+          +'</div>'
+          +'<div id="resultRef"></div>'
+        +'</div>'
+        +'<div>'
+          +'<div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:5px;">'
+            +'<span style="width:8px;height:8px;background:#F59E0B;border-radius:2px;display:inline-block;"></span>Shelf photo — AI annotated'
+          +'</div>'
+          +'<div class="photo-canvas-wrap"><canvas id="shelfCanvas" width="540" height="340"></canvas><div class="slot-tooltip" id="slotTip"></div></div>'
+          +'<div id="missingPanel"></div>'
+        +'</div>'
+      +'</div>'
+
+      // Photo only
+      +'<div id="compViewPhoto" style="display:none;">'
+        +'<div class="photo-canvas-wrap" style="max-width:820px;margin:0 auto;">'
+          +'<canvas id="shelfCanvasLg" width="820" height="500"></canvas>'
+          +'<div class="slot-tooltip" id="slotTipLg"></div>'
+        +'</div>'
+        +'<div id="missingPanelLg"></div>'
+      +'</div>'
+
+      // Reference only
+      +'<div id="compViewRef" style="display:none;"><div id="resultRefFull"></div></div>'
+
+      // Legend
+      +'<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;font-size:11px;">'
+        +'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#166534;border:1.5px solid #86EFAC;font-weight:500;"><span style="width:9px;height:9px;background:#22C55E;border-radius:2px;display:inline-block;"></span>Correct</span>'
+        +'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:#FEE2E2;color:#991B1B;border:1.5px dashed #FCA5A5;font-weight:500;"><span style="width:9px;height:9px;background:#EF4444;border-radius:2px;display:inline-block;"></span>Missing</span>'
+        +'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:#F3E8FF;color:#6B21A8;border:1.5px solid #D8B4FE;font-weight:500;"><span style="width:9px;height:9px;background:#A855F7;border-radius:2px;display:inline-block;"></span>Misplaced</span>'
+        +'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:#FEF3C7;color:#92400E;border:1.5px solid #FCD34D;font-weight:500;"><span style="width:9px;height:9px;background:#F59E0B;border-radius:2px;display:inline-block;"></span>Unexpected</span>'
+      +'</div>'
+    +'</div>'
+
+    // ── Issues Detail ──
+    +'<div class="card" style="margin-bottom:14px;">'
+      +'<div class="section-label" style="margin-bottom:10px;">Issues breakdown — '+totalIssues+' found</div>'
+      +'<div id="issuesList"></div>'
+    +'</div>'
+
+    // ── JSON ──
+    +'<div class="card">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+        +'<div class="section-label" style="margin-bottom:0;">JSON response to FamilyLink</div>'
+        +'<div style="display:flex;gap:6px;">'
+          +'<button class="btn btn-sm" id="jsonCopyBtn" onclick="copyJsonResult(\'jsonOut\',this)">Copy</button>'
+          +'<button class="btn btn-sm" onclick="var cb=this.closest(\'.card\').querySelector(\'.code-block\');cb.style.display=cb.style.display===\'none\'?\'block\':\'none\';">Toggle</button>'
+        +'</div>'
+      +'</div>'
+      +'<div class="code-block" id="jsonOut"></div>'
+    +'</div>';
+
+  // Animate compliance bar
+  requestAnimationFrame(() => setTimeout(() => {
+    const f = document.getElementById('compFill'); if (f) f.style.width = result.score + '%';
+  }, 80));
+
+  // Render reference planogram
+  renderPlanogramRef('resultRef', selectedZoneKey);
+  renderPlanogramRef('resultRefFull', selectedZoneKey);
+
+  // JSON (safe text insertion)
+  const jsonEl = document.getElementById('jsonOut');
+  if (jsonEl) jsonEl.textContent = jsonPayload;
+
+  // Draw annotated canvases
+  setupComparisonCanvas('shelfCanvas', 'slotTip', selectedZoneKey, result, uploadedPhoto);
+  setupComparisonCanvas('shelfCanvasLg', 'slotTipLg', selectedZoneKey, result, uploadedPhoto);
+
+  // Render missing products as HTML panels (removed from canvas to avoid overlap)
+  renderMissingPanel('missingPanel', result);
+  renderMissingPanel('missingPanelLg', result);
+
+  // Issues list
+  const issueStyle = {
+    missing:    { bg:'#FEE2E2', stroke:'#DC2626', icon:'✗', cls:'tag-red'    },
+    misplaced:  { bg:'#F3E8FF', stroke:'#9333EA', icon:'⚠', cls:'tag-purple' },
+    unexpected: { bg:'#FEF3C7', stroke:'#D97706', icon:'!', cls:'tag-amber'  }
+  };
+  const iList = document.getElementById('issuesList');
+  result.issues.forEach(iss => {
+    const c = issueStyle[iss.type];
+    const row = document.createElement('div');
+    row.className = 'issue-item';
+    row.innerHTML =
+      '<div class="issue-dot" style="background:'+c.bg+';color:'+c.stroke+';">'+c.icon+'</div>'
+      +'<div style="flex:1;">'
+        +'<div style="font-size:13px;font-weight:500;">'+iss.prod+'</div>'
+        +'<div style="font-size:11px;color:var(--gray-600);">'+iss.detail+'</div>'
+      +'</div>'
+      +'<span class="tag '+c.cls+'">'+iss.type+'</span>';
+    iList.appendChild(row);
+  });
+}
+
+function copyJsonResult(elementId, btn) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.background = 'var(--green-pale)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function resetCheck() {
+  uploadedPhoto = null;
+  uploadedPhotos = {};
+  currentPlanogramId = null;
+  currentPlanogramInfo = null;
+  gondolaGrid = null;
+
+  const ab = document.getElementById('analyzeBtn');
+  if(ab) ab.disabled = true;
+  const rc = document.getElementById('resultContent');
+  if(rc) rc.innerHTML = '';
+  const sel = document.getElementById('planogramSelect');
+  if(sel) sel.value = '';
+  const preview = document.getElementById('gondolaPreview');
+  if(preview) preview.innerHTML = '<span style="color:var(--gray-400);font-size:13px;">Select a planogram to preview its gondola structure</span>';
+  const meta = document.getElementById('gondolaMeta');
+  if(meta) meta.innerHTML = '';
+  const label = document.getElementById('gondolaLabel');
+  if(label) label.textContent = '—';
+  const btn = document.getElementById('continueBtn');
+  if(btn) btn.disabled = true;
+
+  goCheckStep(1);
+}
+
+/** Render full gondola result (Step 4) */
+// ── Helper: short product name for boxes ─────────────────────────────────────
+function _prodShort(name) {
+  return name.replace(/\s*\d+\s*[gGmMkKlL]+[\w.]*\s*$/, '').trim();
+}
+
+// ── Helper: draw a photo + bbox overlay onto a canvas ────────────────────────
+function _drawSectionCanvas(canvas, photoFile, positions, foundSet, extraSet) {
+  if (!canvas) return;
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  function drawOverlays(imgT) {
+    if (!positions || !positions.length) return;
+    positions.forEach(det => {
+      const bbox = det.bbox; if (!bbox) return;
+      const name = (det.product_name || '').toLowerCase();
+      let status = det.status;
+      if (!status) status = extraSet.has(name) ? 'unexpected' : foundSet.has(name) ? 'found' : 'unknown';
+      const st = { found:{ fill:'rgba(34,197,94,0.22)', stroke:'#22C55E', icon:'✓' },
+                   correct:{ fill:'rgba(34,197,94,0.22)', stroke:'#22C55E', icon:'✓' },
+                   missing:{ fill:'rgba(239,68,68,0.38)', stroke:'#EF4444', icon:'✗' },
+                   unexpected:{ fill:'rgba(245,158,11,0.28)', stroke:'#F59E0B', icon:'!' },
+                   unknown:{ fill:'rgba(107,114,128,0.2)', stroke:'#6B7280', icon:'?' } }[status]
+              || { fill:'rgba(107,114,128,0.2)', stroke:'#6B7280', icon:'?' };
+      const t = imgT || { offsetX:0, offsetY:0, scaleW:W, scaleH:H };
+      const px = bbox.x*t.scaleW+t.offsetX, py = bbox.y*t.scaleH+t.offsetY;
+      const pw = bbox.w*t.scaleW, ph = bbox.h*t.scaleH;
+      const cx=Math.max(0,px), cy=Math.max(0,py), cx2=Math.min(W,px+pw), cy2=Math.min(H,py+ph);
+      if(cx2<=cx||cy2<=cy) return;
+      const r=4, pad=2, bx=cx+pad, by=cy+pad, bw=cx2-cx-pad*2, bh=cy2-cy-pad*2;
+      if(bw<=0||bh<=0) return;
+      ctx.fillStyle=st.fill; ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(bx,by,bw,bh,r) : ctx.rect(bx,by,bw,bh); ctx.fill();
+      ctx.strokeStyle=st.stroke; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx,by,bw,bh,r) : ctx.rect(bx,by,bw,bh); ctx.stroke();
+      if(bh>18&&bw>24) {
+        const lh=Math.min(13,bh*0.28);
+        ctx.fillStyle='rgba(0,0,0,0.65)'; ctx.fillRect(bx,by+bh-lh,bw,lh);
+        ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(lh*0.72)+'px monospace';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        const lbl=(det.product_name||'').replace(/\s*\d+[gG][\w.]*$/,'').slice(0,20);
+        ctx.fillText(lbl, bx+bw/2, by+bh-lh/2);
+      }
+      const br=Math.max(7,Math.min(11,pw*0.12,ph*0.14));
+      const bcx=bx+bw-br-2, bcy=by+br+2;
+      ctx.fillStyle=st.stroke; ctx.beginPath(); ctx.arc(bcx,bcy,br,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(br*1.1)+'px sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(st.icon,bcx,bcy);
+    });
+  }
+
+  if (photoFile) {
+    const img = new Image();
+    img.onload = () => {
+      ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+      const ratio=Math.max(W/img.width,H/img.height);
+      const dw=img.width*ratio, dh=img.height*ratio;
+      const ox=(W-dw)/2, oy=(H-dh)/2;
+      ctx.drawImage(img,ox,oy,dw,dh);
+      ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fillRect(0,0,W,H);
+      drawOverlays({ offsetX:ox, offsetY:oy, scaleW:dw, scaleH:dh });
+    };
+    img.src = URL.createObjectURL(photoFile);
+  } else {
+    ctx.fillStyle='#1e293b'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.font='10px Sora,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('No photo', W/2, H/2);
+  }
+}
+
+function renderFullGondolaResult(data) {
+  const store  = document.getElementById('storeSelect').value;
+  const score  = data.compliance_score || 0;
+  const photos = data.photos || [];
+
+  // Flatten photos → rows for aggregate counts
+  const allRows = [];
+  photos.forEach(photo => {
+    if (photo.row1) allRows.push({ ...photo.row1, _photoKey: photo.photo_key, _rowLabel: 'Top row' });
+    if (photo.row2) allRows.push({ ...photo.row2, _photoKey: photo.photo_key, _rowLabel: 'Bottom row' });
+  });
+
+  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalUnexpected = 0;
+  allRows.forEach(r => {
+    (r.position_results || []).forEach(p => {
+      if (p.status === 'correct')       totalCorrect++;
+      else if (p.status === 'wrong_product') totalWrong++;
+      else if (p.status === 'missing')  totalMissing++;
+      else if (p.status === 'unexpected') totalUnexpected++;
+    });
+  });
+
+  // Derive which columns were checked
+  const colsChecked = [...new Set(photos.map(ph => ph.photo_key.split('.')[0]))].sort();
+
+  const scoreColor  = score >= 90 ? '#16A34A' : score >= 75 ? '#D97706' : '#DC2626';
+  const scoreBorder = score >= 90 ? '#86EFAC' : score >= 75 ? '#FCD34D' : '#FCA5A5';
+  const scoreBg     = score >= 90 ? 'linear-gradient(135deg,#dcfce7,#bbf7d0)'
+                    : score >= 75 ? 'linear-gradient(135deg,#fef3c7,#fde68a)'
+                    :               'linear-gradient(135deg,#fee2e2,#fecaca)';
+  const scoreLabel  = score >= 90 ? 'PASS' : score >= 75 ? 'NEEDS REVIEW' : 'FAIL';
+
+  const STATUS_STYLE = {
+    correct:      { bg:'#F0FDF4', border:'#86EFAC', icon:'✅', color:'#16A34A', label:'Correct' },
+    wrong_product:{ bg:'#FAF5FF', border:'#C4B5FD', icon:'⚠️', color:'#7C3AED', label:'Wrong product' },
+    missing:      { bg:'#FFF1F2', border:'#FCA5A5', icon:'❌', color:'#DC2626', label:'Missing' },
+    unexpected:   { bg:'#FFFBEB', border:'#FCD34D', icon:'⚠️', color:'#D97706', label:'Unexpected' },
+  };
+
+  let html = '';
+
+  // ── 1. Score banner ──────────────────────────────────────────────────────
+  html += '<div class="card" style="margin-bottom:16px;background:'+scoreBg+';border-color:'+scoreBorder+';">'
+    + '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
+    + '<div class="score-ring" style="border-color:'+scoreColor+';">'
+    +   '<span class="snum" style="color:'+scoreColor+';">'+score+'%</span>'
+    +   '<span class="slbl" style="color:'+scoreColor+';">compliance</span>'
+    + '</div>'
+    + '<div style="flex:1;min-width:160px;">'
+    +   '<div style="font-size:17px;font-weight:700;color:'+scoreColor+';margin-bottom:2px;">'
+    +     scoreLabel + ' <span style="font-size:12px;font-weight:400;opacity:0.7;">' + (data.planogram_id || currentPlanogramId) + ' · cols ' + colsChecked.join(', ') + '</span>'
+    +   '</div>'
+    +   '<div style="font-size:11px;color:var(--gray-600);margin-bottom:4px;">'+store+' · '+new Date().toLocaleString('id-ID')+'</div>'
+    +   '<div style="font-size:11px;color:var(--gray-600);">Position-by-position comparison · detected vs planogram JSON</div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0;">'
+    +   '<div class="stat-box" style="border-color:#86EFAC;"><div class="sbn" style="color:#16A34A;">'+totalCorrect+'</div><div class="sbl" style="color:#16A34A;">Correct</div></div>'
+    +   '<div class="stat-box" style="border-color:#C4B5FD;"><div class="sbn" style="color:#7C3AED;">'+totalWrong+'</div><div class="sbl" style="color:#7C3AED;">Wrong pos</div></div>'
+    +   '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">'+totalMissing+'</div><div class="sbl" style="color:#DC2626;">Missing</div></div>'
+    +   '<div class="stat-box" style="border-color:#FCD34D;"><div class="sbn" style="color:#D97706;">'+totalUnexpected+'</div><div class="sbl" style="color:#D97706;">Unexpected</div></div>'
+    + '</div></div></div>';
+
+  // ── 2. Per-photo position tables (grouped by photo / column section) ──────
+  photos.forEach(photo => {
+    if (photo.status === 'error') {
+      html += '<div class="card" style="margin-bottom:14px;border-color:#FCA5A5;">'
+        + '<div style="font-size:13px;font-weight:700;color:#DC2626;">Photo ' + photo.photo_key + ' — Error</div>'
+        + '<div style="font-size:12px;color:var(--gray-600);margin-top:4px;">' + (photo.error || 'Unknown error') + '</div>'
+        + '</div>';
+      return;
+    }
+
+    // Photo header: show thumbnail + key
+    const photoFile = uploadedPhotos[photo.photo_key] || null;
+    const thumbId   = 'thumb_' + photo.photo_key.replace(/[._]/g, '-');
+
+    html += '<div class="card" style="margin-bottom:16px;">'
+      // Photo header bar
+      + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">'
+      +   '<div id="'+thumbId+'" style="width:72px;height:72px;border-radius:8px;background:#1e293b;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;color:#94a3b8;">📷</div>'
+      +   '<div style="flex:1;">'
+      +     '<div style="font-size:15px;font-weight:700;margin-bottom:2px;">Rows '+photo.photo_key.replace('_',' & ')+'</div>'
+      +     '<div style="font-size:11px;color:var(--gray-500);">'+
+              [photo.row1, photo.row2].filter(Boolean).map(r => {
+                const pos = r.position_results || [];
+                const ok = pos.filter(p=>p.status==='correct').length;
+                return r.section_id + ': ' + ok + '/' + (r.planogram_count||pos.length) + ' correct';
+              }).join(' · ')
+            +'</div>'
+      +   '</div>'
+      +   (function() {
+            const ph = photo;
+            const r1 = ph.row1 || {}, r2 = ph.row2 || {};
+            const tot = (r1.planogram_count||0) + (r2.planogram_count||0);
+            const ok  = (r1.correct_count||0)   + (r2.correct_count||0);
+            const pct = tot > 0 ? Math.round(ok/tot*100) : 0;
+            const c = pct>=90?'#16A34A':pct>=75?'#D97706':'#DC2626';
+            return '<div style="text-align:center;flex-shrink:0;">'
+              + '<div style="font-size:24px;font-weight:700;color:'+c+';">'+pct+'%</div>'
+              + '<div style="font-size:10px;color:var(--gray-500);">photo score</div>'
+              + '</div>';
+          })()
+      + '</div>';
+
+    // Per-row tables (row1 top, row2 bottom)
+    [
+      { row: photo.row1, label: 'Top row (shelf ' + (photo.photo_key.split('_')[0]) + ')' },
+      { row: photo.row2, label: 'Bottom row (shelf ' + (photo.photo_key.split('_')[1] || '') + ')' }
+    ].forEach(({ row, label }) => {
+      if (!row || !row.section_id) return;
+      const ss = row.compliance_score || 0;
+      const sc = ss>=90?'#16A34A':ss>=75?'#D97706':'#DC2626';
+      const positions = row.position_results || [];
+
+      html += '<div style="margin-bottom:14px;">'
+        // Row sub-header
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">'
+        +   '<div>'
+        +     '<span style="font-size:13px;font-weight:700;">Row '+row.section_id+'</span>'
+        +     ' <span style="font-size:11px;color:var(--gray-400);">('+label+')</span>'
+        +   '</div>'
+        +   '<div style="display:flex;align-items:center;gap:8px;">'
+        +     '<div class="comp-bar-track" style="width:90px;"><div class="comp-bar-fill" style="background:'+sc+';width:'+ss+'%;"></div></div>'
+        +     '<span style="font-size:13px;font-weight:700;color:'+sc+';">'+ss+'%</span>'
+        +     '<span style="font-size:11px;color:var(--gray-500);">'+row.planogram_count+' slots · '+row.detected_count+' detected · '+row.correct_count+' correct</span>'
+        +   '</div>'
+        + '</div>'
+        // Position table
+        + '<div style="overflow-x:auto;">'
+        + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+        + '<thead><tr style="background:var(--gray-50);">'
+        + '<th style="padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);width:36px;">#</th>'
+        + '<th style="padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);">Planogram (expected)</th>'
+        + '<th style="padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);">Detected on shelf</th>'
+        + '<th style="padding:8px 12px;text-align:center;font-weight:600;border-bottom:2px solid var(--border);width:130px;">Status</th>'
+        + '</tr></thead><tbody>';
+
+      positions.forEach(pos => {
+        const st = STATUS_STYLE[pos.status] || { bg:'#F8F9FA', border:'#DEE2E6', icon:'?', color:'#6C757D', label: pos.status };
+        const planName = pos.planogram_product
+          ? pos.planogram_product + (pos.planogram_color ? ' <span style="color:var(--gray-400);font-size:10px;">(' + pos.planogram_color + ')</span>' : '')
+          : '<span style="color:var(--gray-400);font-style:italic;">—</span>';
+        const detName = pos.detected_product
+          ? pos.detected_product + (pos.detected_confidence ? ' <span style="color:var(--gray-400);font-size:10px;">' + pos.detected_confidence + '%</span>' : '')
+          : '<span style="color:var(--gray-400);font-style:italic;">not detected</span>';
+
+        html += '<tr style="background:'+st.bg+';border-bottom:1px solid var(--border);">'
+          + '<td style="padding:9px 12px;font-weight:700;color:var(--gray-500);">'+pos.position+'</td>'
+          + '<td style="padding:9px 12px;">'+planName+'</td>'
+          + '<td style="padding:9px 12px;">'+detName+'</td>'
+          + '<td style="padding:9px 12px;text-align:center;">'
+          +   '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:'+st.bg+';color:'+st.color+';border:1px solid '+st.border+';">'
+          +   st.icon + ' ' + st.label + '</span>'
+          + '</td></tr>';
+      });
+
+      html += '</tbody></table></div></div>';
+    });
+
+    html += '</div>'; // photo card
+  });
+
+  // ── 3. Raw JSON ──────────────────────────────────────────────────────────
+  html += '<div class="card">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    + '<div class="section-label" style="margin-bottom:0;">Raw JSON Response</div>'
+    + '<div style="display:flex;gap:6px;">'
+    + '<button class="btn btn-sm" onclick="copyJsonResult(\'gondolaJsonOut\',this)">Copy</button>'
+    + '<button class="btn btn-sm" onclick="var cb=document.getElementById(\'gondolaJsonOut\');cb.style.display=cb.style.display===\'none\'?\'block\':\'none\';">Toggle</button>'
+    + '</div></div>'
+    + '<div class="code-block" id="gondolaJsonOut" style="max-height:360px;overflow-y:auto;display:none;"></div>'
+    + '</div>';
+
+  document.getElementById('resultContent').innerHTML = html;
+
+  // Insert JSON safely
+  const jsonBlock = document.getElementById('gondolaJsonOut');
+  if (jsonBlock) jsonBlock.textContent = JSON.stringify(data, null, 2);
+
+  // ── Draw photo thumbnails ──────────────────────────────────────────────────
+  photos.forEach(photo => {
+    const thumbEl = document.getElementById('thumb_' + photo.photo_key.replace(/[._]/g, '-'));
+    if (!thumbEl) return;
+    const file = uploadedPhotos[photo.photo_key];
+    if (!file) return;
+    const img = new Image();
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; thumbEl.innerHTML = ''; thumbEl.appendChild(img); };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════
+//  LIBRARY
+// ═══════════════════════════════════
+function switchLibTab(which) {
+  document.querySelectorAll('.tabs .tab').forEach((t,i)=>t.classList.toggle('active', (i===0&&which==='snack')||(i===1&&which==='biscuit')));
+  document.getElementById('libSnack').style.display = which==='snack'?'block':'none';
+  document.getElementById('libBiscuit').style.display = which==='biscuit'?'block':'none';
+}
+
+function renderLibrary() {
+  const snackKeys = ['snack_1','snack_2','snack_3'];
+  const biscuitKeys = ['biscuit_1','biscuit_2','biscuit_3','biscuit_5'];
+  function renderCol(keys, containerId) {
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    keys.forEach(k => {
+      const plan = PLANS[k];
+      const total = plan.rows.reduce((a,r)=>a+r.slots.length,0);
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.style.marginBottom = '14px';
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:600;font-size:13px;">${plan.id}</div>
+            <div style="font-size:11px;color:var(--gray-500);">${plan.label}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span class="badge badge-green">Active</span>
+            <button class="btn btn-sm btn-primary" onclick="preSelectAndCheck('${k}')">Check shelf →</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
+          <span class="tag tag-gray">${total} product slots</span>
+          <span class="tag tag-gray">${plan.rows.length} rows</span>
+          <span class="tag tag-blue">${plan.file}</span>
+        </div>`;
+      const shelfDiv = document.createElement('div');
+      shelfDiv.id = 'lib_'+k;
+      shelfDiv.style.maxHeight = '200px';
+      shelfDiv.style.overflowY = 'auto';
+      div.appendChild(shelfDiv);
+      c.appendChild(div);
+      renderShelf('lib_'+k, k, null, false);
+    });
+  }
+  renderCol(snackKeys, 'libSnackContent');
+  renderCol(biscuitKeys, 'libBiscuitContent');
+}
+
+function preSelectAndCheck(key) {
+  showPage('check');
+  document.getElementById('zoneSelect').value = key;
+  selectedZoneKey = key;
+  goCheckStep(1);
+}
+
+// ═══════════════════════════════════
+//  PDF UPLOAD PAGE
+// ═══════════════════════════════════
+function renderPdfList() {
+  const c = document.getElementById('pdfList');
+  c.innerHTML = '';
+  pdfLibrary.forEach((pdf, idx) => {
+    c.innerHTML += `
+      <div class="pdf-item">
+        <div class="pdf-icon">📄</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${pdf.name}</div>
+          <div style="font-size:11px;color:var(--gray-500);">${pdf.label} · ${pdf.category} · ${pdf.products} products</div>
+        </div>
+        <span class="tag tag-gray">${pdf.date}</span>
+        <span class="badge badge-green">Active</span>
+      </div>`;
+  });
+}
+
+function handlePdfUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  _lastUploadedPdf = file;
+  document.getElementById('pdfDropZone').innerHTML =
+    '<div style="font-size:28px;margin-bottom:8px;">✅</div>' +
+    '<div style="font-size:14px;font-weight:500;color:var(--green);">' + file.name + ' ready</div>' +
+    '<div style="font-size:12px;color:var(--gray-500);margin-top:3px;">' + (file.size / 1024).toFixed(0) + ' KB · Click to change</div>';
+  document.getElementById('uploadStatus').style.display = 'block';
+  document.getElementById('uploadStatus').innerHTML =
+    '<div class="banner banner-green">✓ PDF selected: ' + file.name + '</div>';
+  document.getElementById('uploadForm').style.display = 'block';
+  var guessLabel = file.name.replace('.pdf', '').toUpperCase();
+  document.getElementById('pdfLabel').value = guessLabel;
+}
+
+async function confirmPdfUpload() {
+  var label = document.getElementById('pdfLabel').value.trim();
+  var cat = document.getElementById('pdfCategory').value;
+  if (!label) { alert('Please enter a zone label.'); return; }
+
+  var online = await isBackendOnline();
+
+  if (online && _lastUploadedPdf) {
+    // ── Real upload to FastAPI backend ──
+    document.getElementById('uploadStatus').innerHTML =
+      '<div class="banner banner-amber">⏳ Uploading PDF & extracting planogram data via Gemini… (30-90s)</div>';
+
+    var formData = new FormData();
+    formData.append('pdf_file', _lastUploadedPdf);
+
+    try {
+      var res = await fetch(API_BASE_URL + '/upload-planogram', {
+        method: 'POST',
+        body: formData,
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+      var sections  = data.extraction.sections_found  || 0;
+      var products  = data.extraction.total_products  || 0;
+      var exStatus  = data.extraction.status;
+
+      document.getElementById('uploadStatus').innerHTML =
+        '<div class="banner banner-green">✅ ' + data.planogram_id + '.pdf uploaded! ' +
+        'Extracted ' + products + ' products across ' + sections + ' rows.' +
+        (exStatus !== 'ok' ? ' ⚠️ Extraction note: ' + exStatus : '') + '</div>';
+
+      // ── Update PDF library list ──
+      var today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+      pdfLibrary.push({
+        name: data.filename, label: data.planogram_id, category: cat,
+        date: today, products: products, status: 'active',
+      });
+
+      // ── Register in PLANS + add to the zone dropdown immediately ──
+      // (so user can select and check without reloading the page)
+      var gondolaSections = data.gondola_sections || [];
+      var existingKey = Object.keys(PLANS).find(
+        k => PLANS[k].file.toUpperCase() === (data.planogram_id + '.PDF')
+      );
+      if (!existingKey) {
+        var sel = document.getElementById('zoneSelect');
+        // Reuse existing "Uploaded Planograms" optgroup or create one
+        var grp = Array.from(sel.querySelectorAll('optgroup'))
+          .find(g => g.label === 'Uploaded Planograms');
+        if (!grp) {
+          grp = document.createElement('optgroup');
+          grp.label = 'Uploaded Planograms';
+          sel.appendChild(grp);
+        }
+        var newKey = registerPlanogramInUI(data.planogram_id, gondolaSections, grp);
+        console.log('[upload] New planogram ready to check:', newKey);
+      }
+
+    } catch (err) {
+      document.getElementById('uploadStatus').innerHTML =
+        '<div class="banner banner-red">✗ Upload failed: ' + err.message + '</div>';
+      return;
+    }
+  } else {
+    // ── Local-only (demo mode) ──
+    pdfLibrary.push({
+      name: label + '.pdf', label: label, category: cat,
+      date: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
+      products: '?', status: 'active'
+    });
+    document.getElementById('uploadStatus').innerHTML =
+      '<div class="banner banner-green">✅ ' + label + '.pdf added to library (demo mode — backend offline).</div>';
+  }
+
+  document.getElementById('uploadForm').style.display = 'none';
+  _lastUploadedPdf = null;
+  document.getElementById('pdfDropZone').innerHTML =
+    '<div style="font-size:36px;margin-bottom:10px;">📄</div>' +
+    '<div style="font-size:14px;font-weight:500;margin-bottom:4px;">Click to upload another planogram PDF</div>' +
+    '<div style="font-size:12px;color:var(--gray-500);">Exported from Spaceman software · PDF format</div>';
+  renderPdfList();
+}
+
+// ═══════════════════════════════════
+//  COMPLIANCE CANVAS ENGINE
+// ═══════════════════════════════════
+
+const SLOT_STYLES = {
+  correct:    { fill:'rgba(34,197,94,0.18)',  stroke:'#22C55E', dash:[],    icon:'✓', badge:'#16A34A' },
+  missing:    { fill:'rgba(239,68,68,0.38)',   stroke:'#EF4444', dash:[5,3], icon:'✗', badge:'#DC2626' },
+  misplaced:  { fill:'rgba(168,85,247,0.22)', stroke:'#A855F7', dash:[],    icon:'⚠', badge:'#9333EA' },
+  unexpected: { fill:'rgba(245,158,11,0.26)', stroke:'#F59E0B', dash:[],    icon:'!', badge:'#D97706' },
+  unknown:    { fill:'rgba(107,114,128,0.22)', stroke:'#6B7280', dash:[4,3], icon:'?', badge:'#4B5563' },
+};
+
+let _overlayVisible = true;
+const _canvasRegistry = {}; // canvasId -> drawFn
+
+function getSlotStatus(result, ri, si) {
+  if (result.missingAt    && result.missingAt.some(p => p.r===ri && p.s===si))    return 'missing';
+  if (result.misplacedAt  && result.misplacedAt.some(p => p.r===ri && p.s===si))  return 'misplaced';
+  if (result.unexpectedAt && result.unexpectedAt.some(p => p.r===ri && p.s===si)) return 'unexpected';
+  return 'correct';
+}
+
+// ── Bbox-based overlay (when AI returns actual product positions) ──────────────
+// imgT = { offsetX, offsetY, scaleW, scaleH } — the cover-fit transform applied
+// when the photo was drawn onto the canvas. Bbox coords are normalized 0-1
+// relative to the FULL original image, so we must map through this transform
+// to get correct canvas pixel positions.
+function drawBboxOverlays(ctx, W, H, result, imgT) {
+  // Default: image fills canvas exactly (no offset/cropping)
+  const t = imgT || { offsetX: 0, offsetY: 0, scaleW: W, scaleH: H };
+
+  const positions = result.detectedWithPositions || [];
+  const foundSet  = new Set((result._raw.found_on_shelf   || []).map(n => n.toLowerCase()));
+  const extraSet  = new Set((result._raw.not_in_planogram || []).map(n => n.toLowerCase()));
+
+  ctx.save();
+  positions.forEach(det => {
+    const bbox = det.bbox;
+    if (!bbox) return;
+    const name = (det.product_name || '').toLowerCase();
+
+    let status = det.status;
+    if (!status) {
+      if (extraSet.has(name))      status = 'unexpected';
+      else if (foundSet.has(name)) status = 'correct';
+      else                         status = 'unknown';
+    }
+
+    // ── Correct canvas coords using the cover-fit image transform ──
+    // Gemini returns bbox normalized 0-1 relative to the full original image.
+    // Map through the same scale+offset used when drawImage() was called.
+    const px = bbox.x * t.scaleW + t.offsetX;
+    const py = bbox.y * t.scaleH + t.offsetY;
+    const pw = bbox.w * t.scaleW;
+    const ph = bbox.h * t.scaleH;
+
+    // Clip boxes that would fall outside the visible canvas area
+    const cx  = Math.max(0, px);
+    const cy  = Math.max(0, py);
+    const cx2 = Math.min(W, px + pw);
+    const cy2 = Math.min(H, py + ph);
+    if (cx2 <= cx || cy2 <= cy) return;
+
+    const st  = SLOT_STYLES[status] || SLOT_STYLES.unknown;
+    const pad = 2, r = 4;
+    const bx = cx + pad, by = cy + pad, bw = (cx2 - cx) - pad * 2, bh = (cy2 - cy) - pad * 2;
+    if (bw <= 0 || bh <= 0) return;
+
+    // Fill
+    ctx.fillStyle = st.fill;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r);
+    else ctx.rect(bx, by, bw, bh);
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = st.stroke;
+    ctx.lineWidth = 2.2;
+    ctx.setLineDash(st.dash);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r);
+    else ctx.rect(bx, by, bw, bh);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Product name label strip at bottom of box
+    if (bh > 20 && bw > 28) {
+      const lh = Math.min(14, bh * 0.25);
+      ctx.fillStyle = 'rgba(0,0,0,0.62)';
+      ctx.fillRect(bx, by + bh - lh, bw, lh);
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold ' + Math.round(lh * 0.70) + 'px monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const rawLabel = det.matched_planogram || det.product_name || 'Unknown';
+      const label = rawLabel.length > 20 ? rawLabel.slice(0, 18) + '…' : rawLabel;
+      ctx.fillText(label, bx + bw / 2, by + bh - lh / 2);
+    }
+
+    // Corner badge
+    const badgeR = Math.max(7, Math.min(12, pw * 0.12, ph * 0.14));
+    const bcx = bx + bw - badgeR - 2, bcy = by + badgeR + 2;
+    ctx.fillStyle = st.badge;
+    ctx.beginPath(); ctx.arc(bcx, bcy, badgeR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold ' + Math.round(badgeR * 1.1) + 'px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(st.icon, bcx, bcy);
+  });
+
+  ctx.restore();
+  // NOTE: Missing products list is now rendered as HTML below the canvas
+  //       (see renderMissingPanel) — no longer drawn on canvas to avoid overlap.
+}
+
+// ── Render missing products as an HTML panel below a canvas ──────────────────
+function renderMissingPanel(panelId, result) {
+  const el = document.getElementById(panelId);
+  if (!el) return;
+  const missing = (result._raw && result._raw.missing_from_shelf) || [];
+  if (!missing.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+
+  el.style.display = 'block';
+  el.innerHTML =
+    '<div style="margin-top:8px;background:#FEF2F2;border:1.5px dashed #FCA5A5;border-radius:8px;padding:10px 12px;">'
+    + '<div style="font-size:11px;font-weight:700;color:#DC2626;margin-bottom:6px;display:flex;align-items:center;gap:5px;">'
+    +   '<span>✗</span><span>MISSING FROM SHELF (' + missing.length + ')</span>'
+    + '</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+    + missing.map(name =>
+        '<span style="font-size:10px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;'
+        + 'border-radius:4px;padding:2px 6px;white-space:nowrap;">'
+        + (name.length > 28 ? name.slice(0, 26) + '…' : name)
+        + '</span>'
+      ).join('')
+    + '</div></div>';
+}
+
+// ── Grid-based overlay (fallback when no bbox data) ────────────────────────────
+function drawCanvasOverlays(ctx, W, H, plan, result, showOverlay, imgT) {
+  // If AI returned real bounding boxes, use those instead of the uniform grid
+  if (result.detectedWithPositions && result.detectedWithPositions.length > 0) {
+    if (showOverlay) drawBboxOverlays(ctx, W, H, result, imgT);
+    return;
+  }
+
+  const numRows = plan.rows.length;
+  const rowH = H / numRows;
+
+  // Shelf edge lines
+  ctx.save();
+  for (let i = 1; i < numRows; i++) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.13)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(0, i * rowH); ctx.lineTo(W, i * rowH); ctx.stroke();
+  }
+
+  if (!showOverlay) { ctx.restore(); return; }
+
+  plan.rows.forEach((row, ri) => {
+    const numSlots = row.slots.length;
+    const slotW = W / numSlots;
+    const y = ri * rowH;
+
+    row.slots.forEach((prod, si) => {
+      const x = si * slotW;
+      const status = getSlotStatus(result, ri, si);
+      const st = SLOT_STYLES[status];
+      const pad = 3, r = 5;
+      const bx = x + pad, by = y + pad, bw = slotW - pad*2, bh = rowH - pad*2;
+
+      // Fill
+      ctx.fillStyle = st.fill;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r);
+      else ctx.rect(bx, by, bw, bh);
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = st.stroke;
+      ctx.lineWidth = status === 'missing' ? 2.5 : 1.8;
+      ctx.setLineDash(st.dash);
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r);
+      else ctx.rect(bx, by, bw, bh);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Corner badge circle
+      const badgeR = Math.max(8, Math.min(13, slotW * 0.15, rowH * 0.22));
+      const bcx = bx + bw - badgeR - 2, bcy = by + badgeR + 2;
+      ctx.fillStyle = st.badge;
+      ctx.beginPath(); ctx.arc(bcx, bcy, badgeR, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold ' + Math.round(badgeR * 1.15) + 'px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(st.icon, bcx, bcy);
+
+      // "MISSING" banner label
+      if (status === 'missing' && bw > 38 && bh > 22) {
+        const lh = Math.min(15, bh * 0.30), lw = Math.min(bw - 10, 56);
+        const lx = bx + (bw - lw) / 2, ly = by + (bh - lh) / 2;
+        ctx.fillStyle = 'rgba(220,38,38,0.92)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(lx, ly, lw, lh, 3);
+        else ctx.rect(lx, ly, lw, lh);
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold ' + Math.round(lh * 0.68) + 'px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('MISSING', lx + lw / 2, ly + lh / 2);
+      }
+    });
+
+    // Row label overlay
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.font = 'bold 9px monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(row.id, 5, y + 4);
+  });
+
+  ctx.restore();
+}
+
+function setupComparisonCanvas(canvasId, tooltipId, planKey, result, photoFile) {
+  const canvas = document.getElementById(canvasId);
+  const tip = document.getElementById(tooltipId);
+  if (!canvas) return;
+
+  const plan = PLANS[planKey];
+  const W = canvas.width, H = canvas.height;
+
+  function draw(showOverlay) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+
+    if (photoFile) {
+      const img = new Image();
+      img.onload = () => {
+        // Cover-fit the photo (scale to fill canvas, preserve aspect ratio)
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, W, H);
+        const ratio = Math.max(W / img.width, H / img.height);
+        const dw = img.width * ratio, dh = img.height * ratio;
+        const ox = (W - dw) / 2, oy = (H - dh) / 2;
+        ctx.drawImage(img, ox, oy, dw, dh);
+
+        // Darkening veil for contrast
+        ctx.fillStyle = 'rgba(0,0,0,0.28)';
+        ctx.fillRect(0, 0, W, H);
+
+        // Pass the exact cover-fit transform so bbox coords are mapped correctly.
+        // Gemini returns bbox normalized 0-1 relative to the FULL original image —
+        // we must apply the same scale+offset that was used for drawImage().
+        const imgT = { offsetX: ox, offsetY: oy, scaleW: dw, scaleH: dh };
+        canvas._lastImgT = imgT;   // store so tooltip hit-test uses the same transform
+        drawCanvasOverlays(ctx, W, H, plan, result, showOverlay, imgT);
+      };
+      img.src = URL.createObjectURL(photoFile);
+    } else {
+      // Stylised shelf background when no photo uploaded
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#1a2e1f');
+      grad.addColorStop(1, '#0d1a10');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Shelf plank tones
+      const numRows = plan.rows.length;
+      const rowH = H / numRows;
+      for (let i = 0; i < numRows; i++) {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.06)';
+        ctx.fillRect(0, i * rowH, W, rowH);
+        // Bottom edge (shelf plank)
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(0, (i + 1) * rowH - 3, W, 3);
+      }
+
+      // "No photo" watermark
+      ctx.fillStyle = 'rgba(255,255,255,0.13)';
+      ctx.font = '11px Sora, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText('No photo uploaded — compliance grid simulated', W / 2, H - 5);
+
+      // No photo → image fills canvas at 0,0 with full W×H (no transform needed)
+      drawCanvasOverlays(ctx, W, H, plan, result, showOverlay, null);
+    }
+  }
+
+  _canvasRegistry[canvasId] = draw;
+  draw(_overlayVisible);
+
+  // ── Hover tooltip ──
+  if (!tip) return;
+  const labels = { correct:'✓ Correct', missing:'✗ Missing', misplaced:'⚠ Misplaced', unexpected:'! Unexpected' };
+  const colors  = { correct:'#22C55E', missing:'#EF4444', misplaced:'#A855F7', unexpected:'#F59E0B' };
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const my = (e.clientY - rect.top)  * (H / rect.height);
+    const tipX = Math.min(e.clientX - rect.left + 14, rect.width - 210);
+    const tipY = Math.max(e.clientY - rect.top - 14, 4);
+
+    // ── Bbox mode: hit-test against real product positions ──
+    const positions = result.detectedWithPositions;
+    if (positions && positions.length > 0) {
+      const foundSet = new Set((result._raw.found_on_shelf   || []).map(n => n.toLowerCase()));
+      const extraSet = new Set((result._raw.not_in_planogram || []).map(n => n.toLowerCase()));
+      // Use stored imgT from last draw call for correct hit-test coords
+      const t = canvas._lastImgT || { offsetX: 0, offsetY: 0, scaleW: W, scaleH: H };
+      let hit = null;
+      for (const det of positions) {
+        const b = det.bbox;
+        if (!b) continue;
+        const px = b.x * t.scaleW + t.offsetX;
+        const py = b.y * t.scaleH + t.offsetY;
+        const pw = b.w * t.scaleW, ph = b.h * t.scaleH;
+        if (mx >= px && mx <= px + pw && my >= py && my <= py + ph) { hit = det; break; }
+      }
+      if (hit) {
+        const name = hit.product_name.toLowerCase();
+        const status = extraSet.has(name) ? 'unexpected' : 'correct';
+        tip.style.left = tipX + 'px'; tip.style.top = tipY + 'px'; tip.style.display = 'block';
+        tip.innerHTML =
+          '<div style="font-weight:700;color:'+colors[status]+';font-size:11px;margin-bottom:2px;">'+labels[status]+'</div>'
+          +'<div style="opacity:0.55;font-size:10px;">'+hit.brand+'</div>'
+          +'<div style="margin-top:4px;white-space:normal;font-size:11px;max-width:190px;">'+hit.product_name+'</div>';
+      } else {
+        tip.style.display = 'none';
+      }
+      return;
+    }
+
+    // ── Grid mode fallback ──
+    const numRows = plan.rows.length;
+    const rowH = H / numRows;
+    const ri = Math.min(numRows - 1, Math.floor(my / rowH));
+    const row = plan.rows[ri];
+    if (!row) return;
+    const si = Math.min(row.slots.length - 1, Math.floor(mx / (W / row.slots.length)));
+    const status = getSlotStatus(result, ri, si);
+
+    tip.style.left = tipX + 'px'; tip.style.top = tipY + 'px'; tip.style.display = 'block';
+    tip.innerHTML =
+      '<div style="font-weight:700;color:'+colors[status]+';font-size:11px;margin-bottom:2px;">'+labels[status]+'</div>'
+      +'<div style="opacity:0.55;font-size:10px;">'+row.id+' · Slot '+(si+1)+'</div>'
+      +'<div style="margin-top:4px;white-space:normal;font-size:11px;max-width:190px;">'+row.slots[si]+'</div>';
+  });
+  canvas.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+}
+
+function toggleOverlay() {
+  _overlayVisible = !_overlayVisible;
+  const btn = document.getElementById('overlayToggle');
+  if (btn) btn.textContent = (_overlayVisible ? '👁 Hide overlay' : '👁 Show overlay');
+  Object.keys(_canvasRegistry).forEach(id => {
+    const fn = _canvasRegistry[id];
+    if (fn) fn(_overlayVisible);
+  });
+}
+
+function switchCompTab(which) {
+  ['side','photo','ref'].forEach(t => {
+    const btn = document.getElementById('ctab_'+t);
+    if (btn) btn.classList.toggle('active', t === which);
+  });
+  const side  = document.getElementById('compViewSide');
+  const photo = document.getElementById('compViewPhoto');
+  const ref   = document.getElementById('compViewRef');
+  if (side)  side.style.display  = which === 'side'  ? 'grid'  : 'none';
+  if (photo) photo.style.display = which === 'photo' ? 'block' : 'none';
+  if (ref)   ref.style.display   = which === 'ref'   ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════
+//  INIT
+// ═══════════════════════════════════
+// ── Build PLANS rows from a gondola_sections array (returned by /info or /upload) ──
+function buildRowsFromSections(gondolaSections) {
+  if (!gondolaSections || !gondolaSections.length) return [];
+  return gondolaSections.map(sec => ({
+    id:    sec.section_label || sec.section_id || '—',
+    h:     sec.shelf_level   || '',
+    slots: (sec.products || []).map(p => p.product_name).filter(Boolean),
+  }));
+}
+
+// ── Register a planogram in PLANS + add an <option> to zoneSelect ─────────────
+function registerPlanogramInUI(planogramId, gondolaSections, groupEl) {
+  const key  = 'uploaded_' + planogramId.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  const rows = buildRowsFromSections(gondolaSections);
+
+  PLANS[key] = {
+    id:       planogramId,
+    label:    planogramId,
+    file:     planogramId + '.pdf',
+    category: 'Uploaded',
+    rows:     rows,
+  };
+  RESULTS[key] = {
+    score:0, correct:0, missing:0, misplaced:0, unexpected:0,
+    missingAt:[], misplacedAt:[], unexpectedAt:[], issues:[],
+    detectedWithPositions:[], _raw:{},
+  };
+
+  const opt = document.createElement('option');
+  opt.value       = key;
+  opt.textContent = planogramId + (rows.length ? ' (' + rows.length + ' rows)' : '');
+  groupEl.appendChild(opt);
+
+  console.log('[planogram-ui] Registered:', planogramId, '→ key:', key,
+              '| rows:', rows.length, '| total slots:', rows.reduce((a,r)=>a+r.slots.length,0));
+  return key;
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  goCheckStep(1);
+  renderLibrary();
+  renderPdfList();
+
+  // Check backend health and show status badge
+  const online = await isBackendOnline();
+  showBackendBadge(online);
+
+  // Populate the planogram dropdown for the check page
+  await populatePlanogramDropdown();
+
+  // Build the testing tab grid immediately with fallback, then reload with real product data
+  _tstBuildGrid();
+  _tstLoadPlanogramData();
+
+
+
+  if (online) {
+    console.log('[planogram-ui] Backend online at ' + API_BASE_URL);
+    try {
+      const r = await fetch(API_BASE_URL + '/planograms');
+      const data = await r.json();
+      const backendIds = data.available_planograms || [];
+      console.log('[planogram-ui] Available planograms from backend:', backendIds);
+
+      // Only inject planograms not already hardcoded in PLANS
+      const coveredIds = new Set(
+        Object.values(PLANS).map(p => p.file.replace('.pdf', '').toUpperCase())
+      );
+      const newIds = backendIds.filter(id => !coveredIds.has(id.toUpperCase()));
+
+      if (newIds.length > 0) {
+        const sel = document.getElementById('zoneSelect');
+        if (!sel) {
+          console.log('[planogram-ui] zoneSelect not found, skipping legacy injection');
+        } else {
+          const grp = document.createElement('optgroup');
+          grp.label = 'Uploaded Planograms';
+
+          // Fetch full section data for each new planogram so rows are populated
+          await Promise.all(newIds.map(async planogramId => {
+            try {
+              const infoRes  = await fetch(API_BASE_URL + '/planograms/' + encodeURIComponent(planogramId) + '/info');
+              const infoData = infoRes.ok ? await infoRes.json() : {};
+              const sections = infoData.gondola_sections || [];
+              registerPlanogramInUI(planogramId, sections, grp);
+            } catch (e) {
+              console.warn('[planogram-ui] Could not fetch info for', planogramId, e);
+              registerPlanogramInUI(planogramId, [], grp);
+            }
+          }));
+
+          sel.appendChild(grp);
+        }
+      }
+    } catch (e) {
+      console.warn('[planogram-ui] Could not sync planogram list:', e);
+    }
+  } else {
+    console.log('[planogram-ui] Backend offline — running in demo mode');
+  }
+});
+
+// ═══════════════════════════════════
+//  TESTING PAGE — SNACK5C Dual-Row
+// ═══════════════════════════════════
+// ── Testing state ─────────────────────────────────────────────────────────────
+let _tstPairs   = ['1.1_1.2', '1.3_1.4', '1.5_1.6']; // active column's pair keys
+let _tstColumn  = '1';                                  // active column number
+let _tstPhotos  = {};                                   // pairKey → File
+let _tstPlanogramData = null;                           // cached /info response
+
+function tstSetPhoto(pairKey, input) {
+  const file = input.files[0];
+  if (!file) return;
+  _tstPhotos[pairKey] = file;
+
+  const preview = document.getElementById('tstPreview_' + pairKey);
+  const label   = document.getElementById('tstLabel_'   + pairKey);
+  const badge   = document.getElementById('tstBadge_'   + pairKey);
+  const card    = document.getElementById('tstCard_'    + pairKey);
+
+  if (preview) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;max-height:80px;object-fit:cover;border-radius:6px;margin-bottom:4px;">';
+    };
+    reader.readAsDataURL(file);
+  }
+  if (label) { label.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)'; label.style.color = 'var(--green)'; }
+  if (badge) { badge.textContent = 'Ready'; badge.style.background = 'var(--green-pale)'; badge.style.color = 'var(--green)'; }
+  if (card)  { card.style.borderColor = 'var(--green-dim)'; }
+
+  _tstUpdateUI();
+}
+
+function _tstUpdateUI() {
+  const count = _tstPairs.filter(k => _tstPhotos[k]).length;
+  document.getElementById('tstUploadedCount').textContent = count + ' / ' + _tstPairs.length + ' photos uploaded';
+  document.getElementById('tstRunBtn').disabled = count === 0;
+}
+
+function tstReset() {
+  _tstPairs.forEach(k => { delete _tstPhotos[k]; });
+  _tstBuildGrid();
+  document.getElementById('tstProgress').style.display = 'none';
+  document.getElementById('tstResults').style.display  = 'none';
+  document.getElementById('tstResults').innerHTML = '';
+  _tstUpdateUI();
+}
+
+function tstSwitchColumn(col) {
+  _tstColumn = col;
+  // Update tab buttons
+  document.getElementById('tstColBtn1').classList.toggle('active', col === '1');
+  document.getElementById('tstColBtn4').classList.toggle('active', col === '4');
+  // Clear all photos
+  Object.keys(_tstPhotos).forEach(k => delete _tstPhotos[k]);
+  // Update pairs for selected column
+  const colNum = parseInt(col);
+  if (_tstPlanogramData) {
+    const secs = (_tstPlanogramData.gondola_sections || [])
+      .filter(s => s.section_id.startsWith(col + '.'))
+      .sort((a, b) => Number(a.section_id.split('.')[1]) - Number(b.section_id.split('.')[1]));
+    _tstPairs = [];
+    for (let i = 0; i < secs.length - 1; i += 2) {
+      _tstPairs.push(secs[i].section_id + '_' + secs[i+1].section_id);
+    }
+    // Fallback if odd number
+    if (secs.length % 2 !== 0 && secs.length > 0) {
+      _tstPairs.push(secs[secs.length - 1].section_id);
+    }
+  } else {
+    _tstPairs = col === '1' ? ['1.1_1.2', '1.3_1.4', '1.5_1.6']
+              : col === '4' ? ['4.1_4.2', '4.3_4.4', '4.5_4.6']
+              : [];
+  }
+  // Update labels
+  const titleEl = document.getElementById('tstPageTitle');
+  if (titleEl) titleEl.textContent = 'SNACK5C — Column ' + col + ' Testing';
+  const tagEl = document.getElementById('tstColumnTag');
+  if (tagEl) tagEl.textContent = 'SNACK5C · column ' + col + ' · rows ' + col + '.1 – ' + col + '.6';
+  const progTitleEl = document.getElementById('tstProgressTitle');
+  if (progTitleEl) progTitleEl.textContent = 'Gemini Vision · SNACK5C Column ' + col + ' Testing';
+  const runBtn = document.getElementById('tstRunBtn');
+  if (runBtn) runBtn.textContent = 'Run SNACK5C Column ' + col + ' Test';
+  // Clear results and rebuild grid
+  document.getElementById('tstProgress').style.display = 'none';
+  document.getElementById('tstResults').style.display  = 'none';
+  document.getElementById('tstResults').innerHTML = '';
+  _tstBuildGrid();
+  _tstUpdateUI();
+}
+
+function _tstBuildGrid() {
+  const container = document.getElementById('tstPhotoGrid');
+  if (!container) return;
+  const secById = {};
+  if (_tstPlanogramData) {
+    (_tstPlanogramData.gondola_sections || []).forEach(s => { secById[s.section_id] = s; });
+  }
+
+  let html = '<div class="grid-3">';
+  _tstPairs.forEach((key, idx) => {
+    const parts = key.split('_');
+    const sid1 = parts[0], sid2 = parts[1];
+    const sec1 = secById[sid1] || { section_id: sid1, products: [] };
+    const sec2 = sid2 ? (secById[sid2] || { section_id: sid2, products: [] }) : null;
+    const prodCount = (sec1.products || []).length + (sec2 ? (sec2.products || []).length : 0);
+    const hasPhoto = !!_tstPhotos[key];
+    const safeKey = key.replace(/\./g, '-');
+
+    html += '<div class="card" id="tstCard_' + key + '" style="position:relative;' + (hasPhoto ? 'border-color:var(--green-dim);' : '') + '">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+      +   '<div>'
+      +     '<div style="font-size:14px;font-weight:700;color:var(--green);">Photo ' + (idx + 1) + '</div>'
+      +     '<div style="font-size:11px;color:var(--gray-500);">Rows ' + sid1 + (sid2 ? ' + ' + sid2 : '') + ' · ' + prodCount + ' products</div>'
+      +   '</div>'
+      +   '<span id="tstBadge_' + key + '" class="badge" style="background:' + (hasPhoto ? 'var(--green-pale)' : 'var(--gray-100)') + ';color:' + (hasPhoto ? 'var(--green)' : 'var(--gray-500)') + ';">' + (hasPhoto ? 'Ready' : 'No photo') + '</span>'
+      + '</div>'
+      + '<div class="pdf-upload-zone" style="min-height:90px;padding:14px;" onclick="document.getElementById(\'tstInput_' + key + '\').click()">'
+      +   '<input type="file" id="tstInput_' + key + '" accept="image/jpeg,image/png" style="display:none;" onchange="tstSetPhoto(\'' + key + '\',this)">'
+      +   '<div id="tstPreview_' + key + '" style="font-size:30px;margin-bottom:5px;">' + (hasPhoto ? '✅' : '📷') + '</div>'
+      +   '<div id="tstLabel_' + key + '" style="font-size:12px;color:' + (hasPhoto ? 'var(--green)' : 'var(--gray-500)') + ';">' + (hasPhoto ? _tstPhotos[key].name : 'Click to upload photo') + '</div>'
+      + '</div>'
+      + '<div style="margin-top:10px;font-size:11px;color:var(--gray-600);line-height:1.8;">'
+      +   '<div style="font-weight:600;margin-bottom:2px;color:var(--green);">Row ' + sid1 + ' (top)</div>';
+
+    (sec1.products || []).forEach(p => { html += '<div>' + p.product_name + '</div>'; });
+
+    if (sec2) {
+      html += '<div style="font-weight:600;margin-top:6px;margin-bottom:2px;color:var(--green);">Row ' + sid2 + ' (bottom)</div>';
+      (sec2.products || []).forEach(p => { html += '<div>' + p.product_name + '</div>'; });
+    }
+
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+async function _tstLoadPlanogramData() {
+  try {
+    const resp = await fetch(API_BASE_URL + '/planograms/SNACK5C/info');
+    if (resp.ok) {
+      _tstPlanogramData = await resp.json();
+      _tstBuildGrid(); // rebuild now that we have real product data
+    } else {
+      _tstBuildGrid(); // build with fallback
+    }
+  } catch (e) {
+    console.warn('[testing] Could not load planogram data:', e.message);
+    _tstBuildGrid(); // build with fallback
+  }
+}
+
+function _tstLog(msg) {
+  const box = document.getElementById('tstLog');
+  if (!box) return;
+  const line = document.createElement('div');
+  line.textContent = msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function _tstSetProgress(pct) {
+  document.getElementById('tstProgressBar').style.width = pct + '%';
+  document.getElementById('tstPctLabel').textContent = pct + '%';
+}
+
+async function runTesting() {
+  const rowKeys = _tstPairs.filter(k => _tstPhotos[k]);
+  if (rowKeys.length === 0) return;
+
+  const store = document.getElementById('tstStoreSelect').value;
+
+  // Show progress
+  const prog = document.getElementById('tstProgress');
+  const res  = document.getElementById('tstResults');
+  prog.style.display = 'block';
+  res.style.display  = 'none';
+  res.innerHTML = '';
+  document.getElementById('tstLog').innerHTML = '';
+  document.getElementById('tstBadgeStatus').innerHTML = '<span class="pulse-dot" style="margin-right:5px;"></span>Running';
+  document.getElementById('tstBadgeStatus').style.background = 'var(--blue-pale)';
+  document.getElementById('tstBadgeStatus').style.color = 'var(--blue)';
+  document.getElementById('tstRunBtn').disabled = true;
+  _tstSetProgress(5);
+
+  const online = await isBackendOnline();
+  if (!online) {
+    _tstLog('[error] Backend not reachable at ' + API_BASE_URL);
+    document.getElementById('tstStatusText').textContent = 'Backend offline — cannot run test';
+    document.getElementById('tstBadgeStatus').innerHTML = '✗ Offline';
+    document.getElementById('tstBadgeStatus').style.background = 'var(--red-pale)';
+    document.getElementById('tstBadgeStatus').style.color = 'var(--red)';
+    document.getElementById('tstRunBtn').disabled = false;
+    return;
+  }
+
+  _tstLog('[system] Backend online at ' + API_BASE_URL);
+  _tstLog('[test] Column ' + _tstColumn + ' — checking ' + rowKeys.length + ' photo(s): ' + rowKeys.join(', '));
+  document.getElementById('tstStatusText').textContent = 'Uploading photos to Gemini Vision…';
+  _tstSetProgress(15);
+
+  const formData = new FormData();
+  formData.append('planogram_id', 'SNACK5C');
+  formData.append('store_id', store);
+  rowKeys.forEach(k => {
+    formData.append('section_pair_keys', k);
+    formData.append('section_photos', _tstPhotos[k]);
+  });
+
+  // Pulse progress while waiting
+  let pulsePct = 20;
+  const pulseTimer = setInterval(() => {
+    if (pulsePct < 88) { pulsePct += 10; _tstSetProgress(pulsePct); }
+  }, 18000);
+
+  try {
+    const t0 = Date.now();
+    _tstLog('[api] Sending request to /check-positions…');
+    _tstLog('[api] Pipeline: image → JSON → position compare');
+    const response = await fetch(API_BASE_URL + '/check-positions', {
+      method: 'POST',
+      body: formData
+    });
+    clearInterval(pulseTimer);
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'HTTP ' + response.status }));
+      throw new Error(err.detail || 'Server error');
+    }
+
+    const data = await response.json();
+    _tstSetProgress(100);
+    _tstLog('[api] Response in ' + elapsed + 's — Score: ' + data.compliance_score + '%');
+    (data.photos || []).forEach(photo => {
+      const r1 = photo.row1 || {}, r2 = photo.row2 || {};
+      [r1, r2].forEach(r => {
+        if (!r.section_id) return;
+        const pos     = r.position_results || [];
+        const correct = pos.filter(p => p.status === 'correct').length;
+        const wrong   = pos.filter(p => p.status === 'wrong_product').length;
+        const missing = pos.filter(p => p.status === 'missing').length;
+        const extra   = pos.filter(p => p.status === 'unexpected').length;
+        _tstLog('[' + r.section_id + '] ' + correct + ' correct · ' + wrong + ' wrong · ' + missing + ' missing · ' + extra + ' unexpected');
+      });
+    });
+
+    document.getElementById('tstStatusText').textContent = 'Done — ' + elapsed + 's';
+    document.getElementById('tstBadgeStatus').innerHTML = '✓ Complete';
+    document.getElementById('tstBadgeStatus').style.background = 'var(--green-pale)';
+    document.getElementById('tstBadgeStatus').style.color = 'var(--green)';
+
+    setTimeout(() => _tstRenderResults(data, rowKeys), 400);
+
+  } catch (err) {
+    clearInterval(pulseTimer);
+    _tstLog('[error] ' + err.message);
+    document.getElementById('tstStatusText').textContent = 'Error — ' + err.message;
+    document.getElementById('tstBadgeStatus').innerHTML = '✗ Error';
+    document.getElementById('tstBadgeStatus').style.background = 'var(--red-pale)';
+    document.getElementById('tstBadgeStatus').style.color = 'var(--red)';
+  }
+
+  document.getElementById('tstRunBtn').disabled = false;
+}
+
+function _tstRenderResults(data, rowKeys) {
+  const res    = document.getElementById('tstResults');
+  const score  = data.compliance_score || 0;
+  // Flatten photos → sections (row1, row2 per photo)
+  const secs = [];
+  (data.photos || []).forEach(photo => {
+    if (photo.row1) secs.push({ ...photo.row1, _photoKey: photo.photo_key, _rowLabel: 'Top row' });
+    if (photo.row2) secs.push({ ...photo.row2, _photoKey: photo.photo_key, _rowLabel: 'Bottom row' });
+    if (photo.status === 'error') secs.push({ status: 'error', section_id: photo.photo_key, error: photo.error });
+  });
+
+  const scoreColor  = score >= 90 ? '#16A34A' : score >= 75 ? '#D97706' : '#DC2626';
+  const scoreBg     = score >= 90
+    ? 'linear-gradient(135deg,#dcfce7,#bbf7d0)'
+    : score >= 75
+      ? 'linear-gradient(135deg,#fef3c7,#fde68a)'
+      : 'linear-gradient(135deg,#fee2e2,#fecaca)';
+  const scoreBorder = score >= 90 ? '#86EFAC' : score >= 75 ? '#FCD34D' : '#FCA5A5';
+  const scoreLabel  = score >= 90 ? 'PASS' : score >= 75 ? 'NEEDS REVIEW' : 'FAIL';
+
+  // Aggregate counts from position_results
+  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalExtra = 0;
+  secs.forEach(s => {
+    (s.position_results || []).forEach(p => {
+      if (p.status === 'correct')      totalCorrect++;
+      else if (p.status === 'wrong_product') totalWrong++;
+      else if (p.status === 'missing') totalMissing++;
+      else if (p.status === 'unexpected') totalExtra++;
+    });
+  });
+
+  let html = '';
+
+  // ── Aggregate banner ──
+  html += '<div class="card" style="margin-bottom:16px;background:' + scoreBg + ';border-color:' + scoreBorder + ';">'
+    + '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
+    + '<div class="score-ring" style="border-color:' + scoreColor + ';">'
+    + '<span class="snum" style="color:' + scoreColor + ';">' + score + '%</span>'
+    + '<span class="slbl" style="color:' + scoreColor + ';">compliance</span>'
+    + '</div>'
+    + '<div style="flex:1;min-width:160px;">'
+    + '<div style="font-size:17px;font-weight:700;color:' + scoreColor + ';margin-bottom:2px;">'
+    + scoreLabel + ' <span style="font-size:12px;font-weight:400;opacity:0.7;">SNACK5C · rows ' + rowKeys.join(', ') + '</span></div>'
+    + '<div style="font-size:11px;color:var(--gray-600);margin-bottom:4px;">'
+    + document.getElementById('tstStoreSelect').value + ' · ' + new Date().toLocaleString('id-ID') + '</div>'
+    + '<div style="font-size:11px;color:var(--gray-600);">Position-by-position comparison · image JSON vs planogram JSON</div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0;">'
+    + '<div class="stat-box" style="border-color:#86EFAC;"><div class="sbn" style="color:#16A34A;">' + totalCorrect + '</div><div class="sbl" style="color:#16A34A;">Correct pos</div></div>'
+    + '<div class="stat-box" style="border-color:#C4B5FD;"><div class="sbn" style="color:#7C3AED;">' + totalWrong + '</div><div class="sbl" style="color:#7C3AED;">Wrong pos</div></div>'
+    + '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">' + totalMissing + '</div><div class="sbl" style="color:#DC2626;">Missing</div></div>'
+    + '<div class="stat-box" style="border-color:#FCD34D;"><div class="sbn" style="color:#D97706;">' + totalExtra + '</div><div class="sbl" style="color:#D97706;">Unexpected</div></div>'
+    + '</div></div></div>';
+
+  // ── Per-section position tables ──
+  const STATUS_STYLE = {
+    correct:      { bg: '#F0FDF4', border: '#86EFAC', icon: '✅', color: '#16A34A', label: 'Correct' },
+    wrong_product:{ bg: '#FAF5FF', border: '#C4B5FD', icon: '⚠️', color: '#7C3AED', label: 'Wrong product' },
+    missing:      { bg: '#FFF1F2', border: '#FCA5A5', icon: '❌', color: '#DC2626', label: 'Missing' },
+    unexpected:   { bg: '#FFFBEB', border: '#FCD34D', icon: '⚠️', color: '#D97706', label: 'Unexpected' },
+  };
+
+  secs.forEach(sec => {
+    if (sec.status === 'error') {
+      html += '<div class="card" style="margin-bottom:14px;border-color:#FCA5A5;">'
+        + '<div style="font-size:13px;font-weight:700;color:#DC2626;">Row ' + sec.section_id + ' — Error</div>'
+        + '<div style="font-size:12px;color:var(--gray-600);margin-top:4px;">' + (sec.error || 'Unknown error') + '</div>'
+        + '</div>';
+      return;
+    }
+
+    const ss = sec.compliance_score || 0;
+    const sc = ss >= 90 ? '#16A34A' : ss >= 75 ? '#D97706' : '#DC2626';
+    const positions = sec.position_results || [];
+
+    html += '<div class="card" style="margin-bottom:16px;">';
+
+    // Section header
+    const rowLabel = sec._rowLabel ? ' <span style="font-size:10px;color:var(--gray-400);font-weight:400;">(' + sec._rowLabel + ')</span>' : '';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">'
+      + '<div>'
+      + '<div style="font-size:14px;font-weight:700;">Row ' + sec.section_id + rowLabel + '</div>'
+      + '<div style="font-size:11px;color:var(--gray-500);">'
+      + sec.planogram_count + ' planogram slots · ' + sec.detected_count + ' detected · ' + sec.correct_count + ' correct'
+      + '</div></div>'
+      + '<div style="display:flex;align-items:center;gap:8px;">'
+      + '<div class="comp-bar-track" style="width:100px;"><div class="comp-bar-fill" style="background:' + sc + ';width:' + ss + '%;"></div></div>'
+      + '<span style="font-size:14px;font-weight:700;color:' + sc + ';">' + ss + '%</span>'
+      + '</div></div>';
+
+    // Position comparison table
+    html += '<div style="overflow-x:auto;">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+      + '<thead><tr style="background:var(--gray-50);">'
+      + '<th style="padding:7px 10px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);width:40px;">Pos</th>'
+      + '<th style="padding:7px 10px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Planogram (expected)</th>'
+      + '<th style="padding:7px 10px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">Detected on shelf</th>'
+      + '<th style="padding:7px 10px;text-align:center;font-weight:600;border-bottom:1px solid var(--border);width:110px;">Status</th>'
+      + '</tr></thead><tbody>';
+
+    positions.forEach(pos => {
+      const st = STATUS_STYLE[pos.status] || { bg: '#F8F9FA', border: '#DEE2E6', icon: '?', color: '#6C757D', label: pos.status };
+      const planName = pos.planogram_product
+        ? (pos.planogram_color
+            ? pos.planogram_product + ' <span style="color:var(--gray-400);font-size:10px;">(' + pos.planogram_color + ')</span>'
+            : pos.planogram_product)
+        : '<span style="color:var(--gray-400);font-style:italic;">—</span>';
+      const detName = pos.detected_product
+        ? pos.detected_product
+          + (pos.detected_confidence ? ' <span style="color:var(--gray-400);font-size:10px;">' + pos.detected_confidence + '%</span>' : '')
+        : '<span style="color:var(--gray-400);font-style:italic;">not detected</span>';
+
+      html += '<tr style="background:' + st.bg + ';border-bottom:1px solid var(--border);">'
+        + '<td style="padding:8px 10px;font-weight:700;color:var(--gray-600);">' + pos.position + '</td>'
+        + '<td style="padding:8px 10px;">' + planName + '</td>'
+        + '<td style="padding:8px 10px;">' + detName + '</td>'
+        + '<td style="padding:8px 10px;text-align:center;">'
+        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:' + st.bg + ';color:' + st.color + ';border:1px solid ' + st.border + ';">'
+        + st.icon + ' ' + st.label
+        + '</span></td></tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  });
+
+  // ── Raw JSON (collapsed) ──
+  html += '<div class="card">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    + '<div class="section-label" style="margin-bottom:0;">Raw JSON response</div>'
+    + '<button class="btn btn-sm" onclick="var cb=this.closest(\'.card\').querySelector(\'.code-block\');cb.style.display=cb.style.display===\'none\'?\'block\':\'none\';">Toggle</button>'
+    + '</div>'
+    + '<div class="code-block" style="display:none;max-height:360px;overflow-y:auto;"></div>'
+    + '</div>';
+
+  res.innerHTML = html;
+  res.style.display = 'block';
+
+  const jsonBlock = res.querySelector('.code-block');
+  if (jsonBlock) jsonBlock.textContent = JSON.stringify(data, null, 2);
+}
+
+</script>
+
+</body>
+</html>
