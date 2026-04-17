@@ -51,10 +51,12 @@ Return a JSON object with this exact structure:
       "products": [
         {
           "position": <integer, left-to-right order starting at 1>,
+          "location_id": "<unique location identifier based on section and position, e.g. 'A-1' or '2-3'>",
           "product_name": "<full product name>",
           "brand": "<brand name>",
           "variant": "<flavor, size, or variant if specified>",
           "facings": <number of product facings side-by-side, default 1 if not specified>,
+          "total_facings": <total number of visible facings for this product, used to identify duplicates or corrected facings>,
           "color_hint": "<dominant packaging color(s), e.g. 'red and white bag', 'blue box'>",
           "size_hint": "<packaging size or shape if visible, e.g. 'tall slim box', 'wide flat bag'>",
           "notes": "<any special instructions or notes from the planogram, empty string if none>"
@@ -69,7 +71,9 @@ Return a JSON object with this exact structure:
 Important rules:
 - Extract EVERY shelf level as a separate section
 - Position numbers must be left-to-right, starting at 1 per shelf level
-- If a product spans multiple facings, set facings > 1 but list it as ONE entry
+- Use `location_id` to uniquely identify each product location with section and position, e.g. `A-1`, `B-3`, or `Shelf2-1`
+- If a product spans multiple facings, set `facings` > 1 but list it as ONE entry
+- Set `total_facings` to the total number of visible facings for that product, including duplicates or corrected facings
 - visual_fingerprint is critical — describe colors and brands visible, this is used to identify which shelf a photo is showing
 - If the PDF has multiple pages, read ALL pages
 - Do not skip any products
@@ -196,7 +200,8 @@ if __name__ == "__main__":
             print(f"       Products ({len(products)}):")
             for p in products:
                 print(f"         {p.get('position'):>2}. {p.get('product_name')} — {p.get('brand')} "
-                      f"[{p.get('color_hint')}] x{p.get('facings', 1)} facing(s)")
+                      f"[{p.get('location_id', 'N/A')}] "
+                      f"[{p.get('color_hint')}] x{p.get('facings', 1)} facing(s) total:{p.get('total_facings', p.get('facings', 1))}")
 
         json_output = Path(target_pdf).with_suffix(".json")
         print(f"\n✓ Full JSON saved to: {json_output}")

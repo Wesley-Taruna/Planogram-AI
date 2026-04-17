@@ -2969,13 +2969,14 @@ function renderFullGondolaResult(data) {
     if (photo.row2) allRows.push({ ...photo.row2, _photoKey: photo.photo_key, _rowLabel: 'Bottom row' });
   });
 
-  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalUnexpected = 0;
+  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalUnexpected = 0, totalDoubleFacing = 0;
   allRows.forEach(r => {
     (r.position_results || []).forEach(p => {
-      if (p.status === 'correct')       totalCorrect++;
-      else if (p.status === 'wrong_product') totalWrong++;
-      else if (p.status === 'missing')  totalMissing++;
-      else if (p.status === 'unexpected') totalUnexpected++;
+      if (p.status === 'correct')           totalCorrect++;
+      else if (p.status === 'wrong_product')    totalWrong++;
+      else if (p.status === 'missing')      totalMissing++;
+      else if (p.status === 'unexpected')   totalUnexpected++;
+      else if (p.status === 'double_facing') totalDoubleFacing++;
     });
   });
 
@@ -2990,10 +2991,11 @@ function renderFullGondolaResult(data) {
   const scoreLabel  = score >= 90 ? 'PASS' : score >= 75 ? 'NEEDS REVIEW' : 'FAIL';
 
   const STATUS_STYLE = {
-    correct:      { bg:'#F0FDF4', border:'#86EFAC', icon:'✅', color:'#16A34A', label:'Correct' },
-    wrong_product:{ bg:'#FAF5FF', border:'#C4B5FD', icon:'⚠️', color:'#7C3AED', label:'Wrong product' },
-    missing:      { bg:'#FFF1F2', border:'#FCA5A5', icon:'❌', color:'#DC2626', label:'Missing' },
-    unexpected:   { bg:'#FFFBEB', border:'#FCD34D', icon:'⚠️', color:'#D97706', label:'Unexpected' },
+    correct:       { bg:'#F0FDF4', border:'#86EFAC', icon:'✅', color:'#16A34A', label:'Correct' },
+    wrong_product: { bg:'#FEF2F2', border:'#FCA5A5', icon:'⚠️', color:'#DC2626', label:'Wrong product' },
+    missing:       { bg:'#F9FAFB', border:'#D1D5DB', icon:'—',  color:'#6B7280', label:'Missing' },
+    unexpected:    { bg:'#FFFBEB', border:'#FCD34D', icon:'⚠️', color:'#D97706', label:'Unexpected' },
+    double_facing: { bg:'#FFF7ED', border:'#FDBA74', icon:'🔁', color:'#C2410C', label:'Double facing' },
   };
 
   let html = '';
@@ -3012,11 +3014,12 @@ function renderFullGondolaResult(data) {
     +   '<div style="font-size:11px;color:var(--gray-600);margin-bottom:4px;">'+store+' · '+new Date().toLocaleString('id-ID')+'</div>'
     +   '<div style="font-size:11px;color:var(--gray-600);">Position-by-position comparison · detected vs planogram JSON</div>'
     + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0;">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;flex-shrink:0;">'
     +   '<div class="stat-box" style="border-color:#86EFAC;"><div class="sbn" style="color:#16A34A;">'+totalCorrect+'</div><div class="sbl" style="color:#16A34A;">Correct</div></div>'
-    +   '<div class="stat-box" style="border-color:#C4B5FD;"><div class="sbn" style="color:#7C3AED;">'+totalWrong+'</div><div class="sbl" style="color:#7C3AED;">Wrong pos</div></div>'
-    +   '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">'+totalMissing+'</div><div class="sbl" style="color:#DC2626;">Missing</div></div>'
+    +   '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">'+totalWrong+'</div><div class="sbl" style="color:#DC2626;">Wrong pos</div></div>'
+    +   '<div class="stat-box" style="border-color:#D1D5DB;"><div class="sbn" style="color:#6B7280;">'+totalMissing+'</div><div class="sbl" style="color:#6B7280;">Missing</div></div>'
     +   '<div class="stat-box" style="border-color:#FCD34D;"><div class="sbn" style="color:#D97706;">'+totalUnexpected+'</div><div class="sbl" style="color:#D97706;">Unexpected</div></div>'
+    +   '<div class="stat-box" style="border-color:#FDBA74;"><div class="sbn" style="color:#C2410C;">'+totalDoubleFacing+'</div><div class="sbl" style="color:#C2410C;">Dbl facing</div></div>'
     + '</div></div></div>';
 
   // ── 2. Per-photo position tables (grouped by photo / column section) ──────
@@ -4096,13 +4099,14 @@ function _tstRenderResults(data, rowKeys) {
   const scoreLabel  = score >= 90 ? 'PASS' : score >= 75 ? 'NEEDS REVIEW' : 'FAIL';
 
   // Aggregate counts from position_results
-  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalExtra = 0;
+  let totalCorrect = 0, totalWrong = 0, totalMissing = 0, totalExtra = 0, totalDoubleFacing = 0;
   secs.forEach(s => {
     (s.position_results || []).forEach(p => {
-      if (p.status === 'correct')      totalCorrect++;
-      else if (p.status === 'wrong_product') totalWrong++;
-      else if (p.status === 'missing') totalMissing++;
-      else if (p.status === 'unexpected') totalExtra++;
+      if (p.status === 'correct')           totalCorrect++;
+      else if (p.status === 'wrong_product')    totalWrong++;
+      else if (p.status === 'missing')      totalMissing++;
+      else if (p.status === 'unexpected')   totalExtra++;
+      else if (p.status === 'double_facing') totalDoubleFacing++;
     });
   });
 
@@ -4122,19 +4126,21 @@ function _tstRenderResults(data, rowKeys) {
     + document.getElementById('tstStoreSelect').value + ' · ' + new Date().toLocaleString('id-ID') + '</div>'
     + '<div style="font-size:11px;color:var(--gray-600);">Position-by-position comparison · image JSON vs planogram JSON</div>'
     + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0;">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;flex-shrink:0;">'
     + '<div class="stat-box" style="border-color:#86EFAC;"><div class="sbn" style="color:#16A34A;">' + totalCorrect + '</div><div class="sbl" style="color:#16A34A;">Correct pos</div></div>'
-    + '<div class="stat-box" style="border-color:#C4B5FD;"><div class="sbn" style="color:#7C3AED;">' + totalWrong + '</div><div class="sbl" style="color:#7C3AED;">Wrong pos</div></div>'
-    + '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">' + totalMissing + '</div><div class="sbl" style="color:#DC2626;">Missing</div></div>'
+    + '<div class="stat-box" style="border-color:#FCA5A5;"><div class="sbn" style="color:#DC2626;">' + totalWrong + '</div><div class="sbl" style="color:#DC2626;">Wrong pos</div></div>'
+    + '<div class="stat-box" style="border-color:#D1D5DB;"><div class="sbn" style="color:#6B7280;">' + totalMissing + '</div><div class="sbl" style="color:#6B7280;">Missing</div></div>'
     + '<div class="stat-box" style="border-color:#FCD34D;"><div class="sbn" style="color:#D97706;">' + totalExtra + '</div><div class="sbl" style="color:#D97706;">Unexpected</div></div>'
+    + '<div class="stat-box" style="border-color:#FDBA74;"><div class="sbn" style="color:#C2410C;">' + totalDoubleFacing + '</div><div class="sbl" style="color:#C2410C;">Dbl facing</div></div>'
     + '</div></div></div>';
 
   // ── Per-section position tables ──
   const STATUS_STYLE = {
-    correct:      { bg: '#F0FDF4', border: '#86EFAC', icon: '✅', color: '#16A34A', label: 'Correct' },
-    wrong_product:{ bg: '#FAF5FF', border: '#C4B5FD', icon: '⚠️', color: '#7C3AED', label: 'Wrong product' },
-    missing:      { bg: '#FFF1F2', border: '#FCA5A5', icon: '❌', color: '#DC2626', label: 'Missing' },
-    unexpected:   { bg: '#FFFBEB', border: '#FCD34D', icon: '⚠️', color: '#D97706', label: 'Unexpected' },
+    correct:       { bg: '#F0FDF4', border: '#86EFAC', icon: '✅', color: '#16A34A', label: 'Correct' },
+    wrong_product: { bg: '#FEF2F2', border: '#FCA5A5', icon: '⚠️', color: '#DC2626', label: 'Wrong product' },
+    missing:       { bg: '#F9FAFB', border: '#D1D5DB', icon: '—',  color: '#6B7280', label: 'Missing' },
+    unexpected:    { bg: '#FFFBEB', border: '#FCD34D', icon: '⚠️', color: '#D97706', label: 'Unexpected' },
+    double_facing: { bg: '#FFF7ED', border: '#FDBA74', icon: '🔁', color: '#C2410C', label: 'Double facing' },
   };
 
   secs.forEach(sec => {
